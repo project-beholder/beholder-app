@@ -1,0 +1,107 @@
+#ip-address {
+  display: none;
+}
+
+html {
+  font-size: 16px;
+}
+
+*, body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#main-app {
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+}
+
+.unselectable {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/*
+  z-index ref
+  nodes: should be 10
+  lines: should be 1
+*/
+
+/* COMPONENTS */
+/* NodeCreator */
+#node-creator {
+  position: absolute;
+  z-index: 100;
+}
+
+#node-creator input {
+  text-align: center;
+  width: 5rem;
+  background: none;
+  border: none;
+  text-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
+}
+
+#node-creator input:focus, #node-creator input:focus-visible {
+  border: none;
+  outline: none;
+}
+
+#node-creator:after {
+  position: absolute;
+  /* content: "&nbsp;"; */
+  content: '';
+  display: inline-block;
+  bottom: -4px;
+  left: 0;
+  width: 5rem;
+  height: 2px;
+  background-color: black;
+  box-shadow: 0px 2px 3px rgb(0 0 0 / 15%);
+}
+
+/* MarkerNode */
+.marker-node {
+  position: absolute;
+  height: 5.5rem;
+  width: 5.5rem;
+
+  padding: 0.75rem;
+  border: 1px dashed #000000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  background-color: #ffffff;
+}
+
+.marker-node img {
+  width: 4rem;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* KeyNod */
+.key-node {
+  position: absolute;
+  height: 4rem;
+  width: 4rem;
+  text-align: center;
+  background-color: #ffffff;
+
+  padding: 0.75rem;
+  border: 1px dashed #000000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+}
+
+.key-node h2 {
+  font-family: sans-serif;
+  font-size: 2rem;
+}

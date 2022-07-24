@@ -1,0 +1,14 @@
+* {
+  margin: 0;
+}
+
+html, body {
+  overflow: hidden;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+}
