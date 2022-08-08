@@ -15,6 +15,9 @@
       document.querySelector('#ip-address').dataset.value = address.ip();
       
       const { ipcRenderer } = require('electron');
+      function globalSendToServer(json) {
+        ipcRenderer.send('update_program_graph', json);
+      }
       // setTimeout(() => ipcRenderer.send('key_press', 7), 5000);
     </script>
     <script src="./dist/bundle.js"></script>

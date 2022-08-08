@@ -12,10 +12,15 @@ html {
   box-sizing: border-box;
 }
 
-#main-app {
+#cycle-root {
   width: 100vw;
   height: 100vh;
   background-color: white;
+}
+
+#node-manager {
+  width: 100vw;
+  height: 100vh;
 }
 
 .unselectable {
@@ -68,18 +73,23 @@ html {
 /* MarkerNode */
 .marker-node {
   position: absolute;
-  height: 5.5rem;
-  width: 5.5rem;
+  top: 0;
+  left: 0;
+  height: 100px;
+  width: 100px;
+  transform: translate(0, 0);
+  /* transition: transform ease-in-out 30ms; */
+  z-index: 10;
 
-  padding: 0.75rem;
-  border: 1px dashed #000000;
+  padding: 20px 20px 20px 20px;
+  border: 1px solid #000000;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
   background-color: #ffffff;
 }
 
 .marker-node img {
-  width: 4rem;
+  width: 60px;
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
@@ -87,16 +97,43 @@ html {
   user-drag: none;
 }
 
+.node-outputs {
+  position: absolute;
+  top: 0;
+  right: -7px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  z-index: 11;
+}
+
+.output-point {
+  width: 14px;
+  height: 14px;
+  background-color: black;
+  border-radius: 20px;
+  display: block;
+  border: 2px solid white;
+}
+
+.output-point:hover { border: 2px solid black; }
+
 /* KeyNod */
 .key-node {
   position: absolute;
+  top: 0;
+  left: 0;
   height: 4rem;
   width: 4rem;
   text-align: center;
   background-color: #ffffff;
+  transform: translate(0, 0);
+  /* transition: transform ease-in-out 30ms; */
+  z-index: 10;
 
   padding: 0.75rem;
-  border: 1px dashed #000000;
+  border: 1px solid #000000;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
 }
@@ -104,4 +141,74 @@ html {
 .key-node h2 {
   font-family: sans-serif;
   font-size: 2rem;
+}
+
+.node-inputs {
+  position: absolute;
+  top: 0;
+  left: -0.3rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  z-index: 11;
+}
+
+.input-point {
+  width: 0.6rem;
+  height: 0.6rem;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 20px;
+  display: block;
+}
+
+.input-point:hover { border-width: 4px; }
+
+/* svg line stuff */
+#connection-lines {
+  width: 100vw;
+  height: 100vh;
+  /* position: absolut; */
+}
+
+.connection-path {
+  stroke:#aaa;
+  stroke-width:2;
+  stroke-dasharray: 5;
+  animation: dash .5s linear infinite;
+  animation-iteration-count: infinite;
+  transition: color .1s ease-in-out;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+.connection-path:hover {
+  /* stroke-width: 4; */
+  stroke: #000;
+}
+
+.preview-path {
+  stroke:transparent;
+  stroke-width: 2;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+.visible {
+  stroke:#aaaaaa;
+}
+
+.send-to-server {
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }

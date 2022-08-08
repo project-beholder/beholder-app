@@ -1,7 +1,5 @@
 const { app, BrowserWindow } = require("electron");
-// const app = require("electron").remote;
 const path = require("path");
-const { ipcMain } = require('electron');
 
 function createWindow() {
   // Create the browser window.
@@ -47,21 +45,3 @@ app.on("window-all-closed", () => {
 
 // run udp server
 require('./UDPManager.js');
-
-
-// Keyboard stuff
-// Natvie modules cannot run in the renderer, which is why we do this
-const keyEmulator = require('./build/Release/keyboard_emulator');
-keyEmulator.init();
-
-// Key up events from Electron
-ipcMain.on('key_press', (event, arg) => {
-  keyEmulator.press(arg);
-});
-
-// Key down events from Electron
-ipcMain.on('key_release', (event, arg) => {
-  keyEmulator.release(arg);
-});
-
-

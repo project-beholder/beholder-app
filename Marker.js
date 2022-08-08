@@ -25,6 +25,8 @@ class Marker {
     this.avgSideLength = 0;
     this.deltaAvgSideLength = 0;
     this.id = ID;
+    this.posX = 0;
+    this.posY = 0;
 
     this.positionSmoothing = 0; // Percent of previous position carried over into the new one, must be btw 0 and 1
     this.rotationSmoothing = 0; // Percent of previous rotation carried over into the new one, must be btw 0 and 1
@@ -48,6 +50,8 @@ class Marker {
     this.position.copy(this.center);
     this.rawPosition.x = x;
     this.rawPosition.x = y;
+    this.posX = this.center.x;
+    this.posY = this.center.y;
 
     this.deltaPosition.sub(this.position).scale(-1); // bc we changed center this should be cool now
 

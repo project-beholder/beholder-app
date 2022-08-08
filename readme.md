@@ -21,3 +21,7 @@ apple key codes: https://eastmanreference.com/complete-list-of-applescript-key-c
 `npm run build` or `npm run dev`
 `npm start`
 
+## Inspo
+enso lang
+https://reactflow.dev/
+
