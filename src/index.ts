@@ -43,7 +43,7 @@ function main(sources: any) {
 }
 
 // TODO
-// Auto save on "connection, create"
+// Switch to map datastructure for graph https://www.youtube.com/watch?v=hRSwSAr-gok
 // can load a mapping
 // switch node creator to overlay
 // place nodes near previous

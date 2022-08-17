@@ -8,10 +8,10 @@ export function MarkerNode(props) {
     [
       img('.unselectable', { attrs: { src: `./Assets/Markers/Marker${markerID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '106', offsetY: '17' }}),
-        span('.output-point', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '106', offsetY: '39' }}),
-        span('.output-point', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '106', offsetY: '61' }}),
-        span('.output-point', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '106', offsetY: '84' }}),
+        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '220', offsetY: '27' }}, 'present'),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '220', offsetY: '53' }}, 'x'),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '220', offsetY: '78' }}, 'y'),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '220', offsetY: '104' }}, 'rotation'),
       ])
     ]
   )
@@ -25,7 +25,7 @@ export function KeyNode(props) {
     [
       h2('.unselectable', key),
       div('.node-inputs', [
-        span('.input-point', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '-3', offsetY: '32' } })
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '-68', offsetY: '40' } }, 'press')
       ])
     ]
   )

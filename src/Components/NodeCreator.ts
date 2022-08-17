@@ -78,7 +78,8 @@ export default function NodeCreator(sources: any) {
       return null; // Temp ignore problems for now
     })
     .filter(R.pipe(R.isNil, R.not))
-    .map((n) => ({ command: 'create', props: n }));
+    .map((n) => ({ command: 'create', props: n }))
+    .startWith({ command: 'create', props: { type: 'key', key: 'x', x: 10, y: 10 } });
     // .startWith({ command: 'create', props: { type: 'marker', markerID: 0, x: 10, y: 10 } });
 
   const sinks = {

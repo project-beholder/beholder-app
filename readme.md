@@ -13,6 +13,7 @@ apple key codes: https://eastmanreference.com/complete-list-of-applescript-key-c
 
 ## setup
 `npm install`
+`sudo npm install -g node-gyp`
 `node-gyp configure`
 `node-gyp build`
 `npm run rebuild`

@@ -46,20 +46,29 @@ html {
 
 #node-creator input {
   text-align: center;
-  width: 5rem;
+  width: 150px;
+  height: 40px;
+  font-size: 18px;
   background: none;
   border: none;
-  text-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
+  /* box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); */
+
+  box-shadow: 0px 2px 6px rgb(0 0 0 / 40%);
+
+  padding: 6px;
+  border-radius: 8px;
+  border-bottom: 3px solid black;
 }
 
 #node-creator input:focus, #node-creator input:focus-visible {
   border: none;
+  border-radius: 8px;
+  border-bottom: 3px solid black;
   outline: none;
 }
 
-#node-creator:after {
+/* #node-creator:after {
   position: absolute;
-  /* content: "&nbsp;"; */
   content: '';
   display: inline-block;
   bottom: -4px;
@@ -68,20 +77,20 @@ html {
   height: 2px;
   background-color: black;
   box-shadow: 0px 2px 3px rgb(0 0 0 / 15%);
-}
+} */
 
 /* MarkerNode */
 .marker-node {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100px;
-  width: 100px;
+  height: 130px;
+  width: 130px;
   transform: translate(0, 0);
   /* transition: transform ease-in-out 30ms; */
   z-index: 10;
 
-  padding: 20px 20px 20px 20px;
+  padding: 25px 25px 25px 25px;
   border: 1px solid #000000;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
@@ -89,7 +98,7 @@ html {
 }
 
 .marker-node img {
-  width: 60px;
+  width: 80px;
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
@@ -99,40 +108,84 @@ html {
 
 .node-outputs {
   position: absolute;
-  top: 0;
-  right: -7px;
-  height: 100%;
+  top: 5%;
+  right: -90px;
+  height: 90%;
+  padding: 0 15px;
+  width: 90px;
+  border: 1px dashed black;
+  border-left: none;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  z-index: 11;
+  z-index: 9;
+  border-radius: 0 5px 5px 0;
+  font-family: monospace;
+  font-size: 12px;
 }
 
 .output-point {
-  width: 14px;
-  height: 14px;
-  background-color: black;
-  border-radius: 20px;
-  display: block;
-  border: 2px solid white;
+  z-index: 20;
+  text-align: right;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
 }
 
-.output-point:hover { border: 2px solid black; }
+.output-point.number-data:after {
+  width: 15px;
+  height: 15px;
+  content: '';
+  background-color: black;
+  border-radius: 20px;
+  right: -24px;
+  top: -1px;
+  display: block;
+  position: absolute;
+  border: 1px solid white;
+}
+
+.output-point.number-data:hover:after { border: 1px solid black; }
+
+.output-point.bool-data:after {
+  content: '';
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  top: -2px;
+  right: -27px;
+
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 18px solid black;
+}
+
+.output-point.bool-data:hover:before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 22px solid black;
+  position: absolute;
+  top: -4px;
+  right: -30px;
+}
 
 /* KeyNod */
 .key-node {
   position: absolute;
   top: 0;
   left: 0;
-  height: 4rem;
-  width: 4rem;
+  height: 80px;
+  width: 80px;
   text-align: center;
   background-color: #ffffff;
   transform: translate(0, 0);
   /* transition: transform ease-in-out 30ms; */
   z-index: 10;
 
-  padding: 0.75rem;
+  padding: 20px;
   border: 1px solid #000000;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
@@ -140,21 +193,40 @@ html {
 
 .key-node h2 {
   font-family: sans-serif;
-  font-size: 2rem;
+  font-size: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .node-inputs {
   position: absolute;
-  top: 0;
-  left: -0.3rem;
-  height: 100%;
+  top: 5%;
+  left: -70px;
+  height: 90%;
+  padding: 0 18px;
+  width: 70px;
+  border: 1px dashed black;
+  border-right: none;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  z-index: 11;
+  z-index: 9;
+  border-radius: 5px 0 0 5px;
+  font-family: monospace;
+  font-size: 12px;
 }
 
 .input-point {
+  z-index: 20;
+  text-align: left;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* .input-point.number-data {
   width: 0.6rem;
   height: 0.6rem;
   background-color: white;
@@ -163,7 +235,36 @@ html {
   display: block;
 }
 
-.input-point:hover { border-width: 4px; }
+.input-point.number-data:hover { border-width: 4px; } */
+
+
+.input-point.bool-data:after {
+  content: '';
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  top: 3px;
+  left: -23px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 11px solid white;
+}
+
+.input-point.bool-data:hover:after {
+  border-left: 18px solid black;
+}
+
+.input-point.bool-data:before {
+  content: '';
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: -2px;
+  left: -26px;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 20px solid black;
+}
 
 /* svg line stuff */
 #connection-lines {
