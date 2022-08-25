@@ -26,10 +26,12 @@ namespace demo {
         }
 
         // Create keyboard event for release
-        ZeroMemory(ip, sizeof(INPUT));
+        // ZeroMemory(ip, sizeof(INPUT));
         ip.type = INPUT_KEYBOARD;
-        ip.wVk  = args[0].As<Number>()->Value();
+        ip.ki.wVk  = args[0].As<Number>()->Value();
         ip.ki.dwFlags = KEYEVENTF_KEYUP;
+        // ip.ki.wScan = args[0].As<Number>()->Value();
+        // ip.ki.dwFlags = KEYEVENTF_KEYUP;
 
         // Send event
         SendInput(1, &ip, sizeof(INPUT));
@@ -46,9 +48,11 @@ namespace demo {
         }
 
         // Create keyboard event for press
-        ZeroMemory(ip, sizeof(INPUT));
+        // ZeroMemory(ip, sizeof(INPUT));
         ip.type = INPUT_KEYBOARD;
-        ip.wVk  = args[0].As<Number>()->Value();
+        ip.ki.wVk  = args[0].As<Number>()->Value();
+        // ip.ki.wScan = args[0].As<Number>()->Value();
+        // ip.ki.dwFlags = KEYEVENTF_SCANCODE;
 
         // Send event
         SendInput(1, &ip, sizeof(INPUT));
