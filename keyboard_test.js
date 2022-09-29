@@ -2,7 +2,7 @@
 
 const keyEmulator = require('./build/Release/keyboard_emulator');
 
-// keyEmulator.init();
+// keyEmulator.init();a
 setTimeout(() => keyEmulator.press(0x41), 5000);
 setTimeout(() => keyEmulator.release(0x41), 10000);
 

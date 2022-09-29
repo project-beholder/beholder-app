@@ -30,6 +30,21 @@
           }
         ]
       ],
+    },
+    {
+      "target_name": "marker_detection",
+      'conditions': [
+        ['OS == "win"', {
+          'sources': [ 'marker_detection/src/marker_detection_win.cc' ],
+          'include_dirs': [
+            'marker_detection/include',
+            'C:/OpenCV-4.5.5/install/install/opencv/include'
+          ],
+          'libraries': [
+            'C:/OpenCV-4.5.5/install/install/opencv/x64/vc17/lib/opencv_world460.lib'
+          ]
+        }],
+      ]
     }
   ]
 }
