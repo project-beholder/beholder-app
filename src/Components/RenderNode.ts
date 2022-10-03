@@ -31,10 +31,20 @@ export function KeyNode(props) {
   )
 }
 
+export function IntNode(node) {
+
+}
+
+export function CharNode(node) {
+  
+}
+
 export default function renderNode(node) {
   switch(node.type) {
     case 'marker': return MarkerNode(node);
     case 'key': return KeyNode(node);
+    case 'int': return IntNode(node);
+    case 'char': return CharNode(node);
     default: return div('.null');
   }
 }

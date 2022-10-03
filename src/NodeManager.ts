@@ -4,10 +4,14 @@ import { div, svg, h, button } from '@cycle/dom';
 import { v4 as uuidv4 } from 'uuid';
 import * as R from 'ramda';
 
-
 // Local
 import renderNode from './Components/RenderNode';
 import sampleCombine from 'xstream/extra/sampleCombine';
+import UndoRedoManager from './UndoRedoManager';
+
+function distanceSq(x1: number, y1: number, x2: number, y2: number): number {
+  return (x1 - x2) * (x1 - x2) + (y1 - y2) + (y1 - y2);
+}
 
 function createNode(props, uuid) {
   // Could replace this with an object that has functions for processing
@@ -68,9 +72,19 @@ function NodeManager(sources: any) {
       };
     });
 
+  // UNDO REDO SETUP
+  const cmdZPress$ = DOM.select('document').events('keydown')
+    .filter((e) => {
+      return (e.key == 'z' && e.metaKey)
+    });
+  const undo$ = cmdZPress$.filter((e) => (!e.shiftKey)).mapTo({ command: 'undo' });
+  const redo$ = cmdZPress$.filter((e) => (e.shiftKey)).mapTo({ command: 'redo' });
+
+  const draggableDown$ = DOM.select('.draggable-node').events('mousedown');
+  const draggableUp$ = DOM.select('.draggable-node').events('mouseup')
   const isHeld$ = xs.merge(
-    DOM.select('.draggable-node').events('mousedown').mapTo(true),
-    DOM.select('.draggable-node').events('mouseup').mapTo(false),
+    draggableDown$.mapTo(true),
+    draggableUp$.mapTo(false),
     mouseUp$.mapTo(false),
   );
 
@@ -79,14 +93,28 @@ function NodeManager(sources: any) {
     .map(([pos, held]) => ({ command: 'move', props: { ...held, ...pos } }));
   
   const connectProxy$ = xs.create();
+
+  // hack for movement undo
+  const moveEnd$ = xs.combine(mousePos$, isHeld$)
+    .fold((acc, [pos, isHolding]) => {
+      
+      return acc;
+    }, { prevPos: { x: 0, y: 0 }, dist: 0, wasHolding: false, isHolding: false})
+    .filter(({ dist, wasHolding, isHolding }) => (dist > 200 && wasHolding && !isHolding))
+    .mapTo({ command: 'move-end'}).debug();
+
   // generate node objects from all of the elements
-  const nodes$ = xs.merge(create$, move$, connectProxy$)
-    .fold((nodes, action) => {
+  // move this to a function + file
+  const nodes$ = xs.merge(create$, move$, connectProxy$, undo$, redo$, moveEnd$)
+    .fold((oldNodes, action) => {
+
+      let nodes = R.clone(oldNodes);
       switch(action.command) {
         case 'create':
           const uuid = uuidv4();
           nodes[uuid] = createNode(action.props, uuid);
           globalSendToServer(nodes);
+          UndoRedoManager.pushUndoState(nodes);
           break;
         case 'move':
           nodes[action.props.uuid].x = action.props.x - action.props.offsetX;
@@ -118,8 +146,24 @@ function NodeManager(sources: any) {
             });
           }
           globalSendToServer(nodes);
+          UndoRedoManager.pushUndoState(nodes);
           // only connected 1 way atm, let's see if it works (output -> input)
           // also should validate if this is any good
+          break;
+        case 'move-end':
+          UndoRedoManager.pushUndoState(nodes);
+          break;
+        case 'undo':
+          if (UndoRedoManager.canUndo()) {
+            nodes = UndoRedoManager.undo();
+            globalSendToServer(nodes);
+          }
+          break;
+        case 'redo':
+          if (UndoRedoManager.canRedo()) {
+            nodes = UndoRedoManager.redo();
+            globalSendToServer(nodes);
+          }
           break;
       }
       return nodes;
@@ -145,16 +189,18 @@ function NodeManager(sources: any) {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
         const heldNode = nodes[data.parent];
-        return h(
-          'line.preview-path',
-          {
-            class: { visible: show },
-            attrs: {
-              x1: heldNode.x + offsetX, y1: heldNode.y + offsetY,
-              x2: mouse.x, y2: mouse.y
-            }
-          }
-        )
+
+        if (heldNode) {
+          return h('line.preview-path',
+            {
+              class: { visible: show },
+              attrs: {
+                x1: heldNode.x + offsetX, y1: heldNode.y + offsetY,
+                x2: mouse.x, y2: mouse.y
+              }
+            });
+        }
+        return h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } })
       }).startWith(h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }))
       // .mapTo(h('path.preview-path.visible', {
       //   attrs: { d: "M100,250 C100,100 400,100 400,250" } 
