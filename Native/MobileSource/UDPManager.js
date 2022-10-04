@@ -10,7 +10,7 @@ keyEmulator.init();
 console.log(address.ip())   // '192.168.0.2'
 
 const dgram = require('node:dgram');
-const Marker = require('./Marker.js');
+const Marker = require('../Marker.js');
 const getKeyCode = require('./MacKeyMap');
 
 // Marker stuff

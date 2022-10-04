@@ -14,7 +14,7 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "./index.html"));
+  mainWindow.loadFile(path.join(__dirname, "./Interface/index.html"));
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -44,4 +44,4 @@ app.on("window-all-closed", () => {
 });
 
 // run udp server
-require('./UDPManager.js');
+// require('./UDPManager.js');

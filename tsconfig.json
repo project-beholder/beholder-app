@@ -12,6 +12,6 @@
     "strict": true,
     "target": "es6",
   },
-  "include": ["src/**/*"],
+  "include": ["Interface/**/*"],
   "exclude": ["node_modules", "js"],
 }

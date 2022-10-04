@@ -4,9 +4,9 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "build": "esbuild ./src/index.ts --bundle --tsconfig=tsconfig.json --minify --sourcemap --outfile=dist/bundle.js",
-    "dev": "esbuild ./src/index.ts --watch --bundle --tsconfig=tsconfig.json --sourcemap --outfile=dist/bundle.js",
-    "start": "electron ./app.js",
+    "build": "esbuild ./Interface/index.ts --bundle --tsconfig=tsconfig.json --minify --sourcemap --outfile=dist/bundle.js",
+    "dev": "esbuild ./Interface/index.ts --watch --bundle --tsconfig=tsconfig.json --sourcemap --outfile=dist/bundle.js",
+    "start": "electron ./main.js",
     "rebuild": "electron-rebuild"
   },
   "author": "",

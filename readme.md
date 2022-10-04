@@ -1,3 +1,5 @@
+# IGNORE ALL THIS FOR NOW
+
 # testing c++ 
 `node-gyp build`
 -- will need to regoogle this probably for linux and windows
