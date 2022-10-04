@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Beholder Observables</title>
     <link rel="stylesheet" href="./Assets/Styles/Main.css" type="text/css">
+    <link rel="stylesheet" href="./Assets/Styles/NodePalette.css" type="text/css">
+    <link rel="stylesheet" href="./Assets/Styles/Nodes.css" type="text/css">
   </head>
   <body>
     <section id="main-app"></section>
@@ -16,7 +18,8 @@
       
       const { ipcRenderer } = require('electron');
       function globalSendToServer(json) {
-        ipcRenderer.send('update_program_graph', json);
+        // console.warn()
+        // ipcRenderer.send('update_program_graph', json);
       }
       // setTimeout(() => ipcRenderer.send('key_press', 7), 5000);
     </script>

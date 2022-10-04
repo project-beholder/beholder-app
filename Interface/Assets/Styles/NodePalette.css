@@ -1,0 +1,8 @@
+#node-palette {
+  position: absolute;
+  display: none;
+}
+
+#node-palette.display {
+  display: block;
+}

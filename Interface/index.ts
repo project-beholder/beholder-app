@@ -6,30 +6,28 @@ import {run} from '@cycle/run';
 import {div, makeDOMDriver } from '@cycle/dom';
 
 // Local
-import NodeCreator from './Components/NodeCreator';
+import NodePalette from './Components/NodePalette';
 import NodeManager from './NodeManager';
 
 function main(sources: any) {
   const { DOM } = sources;
 
   // only do this for global events
-  const spacebar$ = fromEvent(document.querySelector('body'), 'keypress')
-    .filter((ev) => ev.key === ' ');
+  const documentKeyDown$ = fromEvent(document, 'keydown');
+  const spacebar$ = documentKeyDown$.filter((ev) => ev.key === ' ');
+  const esc$ = documentKeyDown$.filter((ev) => ev.key === 'Escape');
 
-  const mousePos$ = DOM
-    .events('mousemove') // dividing bc REM size
-    .map((ev: MouseEvent) => ({ x: ev.clientX, y: ev.clientY }));
-  
+  const mousePos$ = DOM.events('mousemove').map((ev: MouseEvent) => ({ x: ev.clientX, y: ev.clientY }));
+
   const mouseUp$ = xs.merge(DOM.events('mouseup'), DOM.events('mouseleave'));
   
-  const creatorProp$ = spacebar$.compose(sampleCombine(mousePos$))
-    .map(([_, pos]) => ({ x: pos.x - 64, y: pos.y, show: true }))
-    .startWith({ x: 0, y: 0, show: false });
+  const paletteProp$ = xs.merge(spacebar$.mapTo({ display: true }), esc$.mapTo({ display: false }))
+    .startWith({ display: false });
 
-  const creator = NodeCreator({ DOM: sources.DOM, props$: creatorProp$ });
-  const nodeManager = NodeManager({ DOM: sources.DOM, mouseUp$, mousePos$, create$: creator.create$ });
+  const palette = NodePalette({ DOM: sources.DOM, props$: paletteProp$ });
+  const nodeManager = NodeManager({ DOM: sources.DOM, mouseUp$, mousePos$, create$: palette.create$ });
 
-  const vdom$ = xs.combine(creator.DOM, nodeManager.DOM)
+  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM)
     .map(([creator, manager]) =>
       div("#cycle-root", [
         creator,
