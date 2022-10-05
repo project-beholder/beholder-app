@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
 project( OpenCV_ArUco )
 
-set(OpenCV_DIR "/Users/petergyory/Documents/opencv_nonsense/build_opencv/")
+set(OpenCV_DIR "C:/OpenCV-4.5.5/install/install/opencv")
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS} include)
 
-add_executable(detectMarkers src/marker_Detection.cpp)
+add_executable(detectMarkers src/marker_Detection.cpp src/image_markers.cpp)
 
 target_link_libraries(detectMarkers ${OpenCV_LIBS})

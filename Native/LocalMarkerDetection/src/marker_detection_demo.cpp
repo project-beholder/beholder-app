@@ -10,12 +10,8 @@
 
 #include <iostream>
 
-#include "image_markers.hpp"
-
 using namespace std;
-
 using namespace cv;
-
 
 int main( int argc, char* argv[] )
 {
@@ -25,25 +21,25 @@ int main( int argc, char* argv[] )
 
     // Obtain ArUco dictionary and create detector
     Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_ARUCO_ORIGINAL);
-
-    ImageMarkers marker_mngr(dictionary);
+    aruco::ArucoDetector detector(dictionary);
 
     while (inputVideo.grab()) {
         // Capture frame
-        Mat image;
+        Mat image, imageCopy;
         inputVideo.retrieve(image);
+        image.copyTo(imageCopy);
 
-        if (marker_mngr.detect(image)) {
-            marker_mngr.draw(image);
+        // Detect markers
+        vector<int> ids;
+        vector<vector<Point2f>> corners, rejected;
+        detector.detectMarkers(image, corners, ids, rejected);
 
-            // Obtain and print markers in json
-            string buff; 
-            marker_mngr.get_json(buff);
-            cout << "Markers found: " << endl << buff << endl;
-        }
+        // If marker detected, show
+        if (ids.size() > 0)
+            aruco::drawDetectedMarkers(imageCopy, corners, ids);
 
         // Show image
-        imshow("out", image);
+        imshow("out", imageCopy);
         char key = (char) waitKey(10);
         if (key == 27)
             break; 
