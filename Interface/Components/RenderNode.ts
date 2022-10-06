@@ -1,4 +1,6 @@
-import {div, img, span, h2 } from '@cycle/dom';
+import { div, img, span, h2, select, option } from '@cycle/dom';
+
+import { KEY_MAPPINGS } from '../Constants/Keys';
 
 export function MarkerNode(props) { 
   const { x, y, markerID, uuid } = props;
@@ -18,15 +20,19 @@ export function MarkerNode(props) {
 };
 
 export function KeyNode(props) {
-  const { x, y, key, uuid } = props;
+  const { x, y, key, uuid, selected } = props;
   return div(
-    '.draggable-node.key-node',
-    { style: { transform: `translate(${x}px, ${y}px)` }, dataset: { uuid } },
+    '.draggable-node.dark-node',
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
-      h2('.unselectable', key),
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '-68', offsetY: '40' } }, 'press')
-      ])
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '-68', offsetY: '40' } }, 'SEND')
+      ]),
+      select(
+        '.node-select-input.key-select',
+        { dataset: { uuid } },
+        KEY_MAPPINGS.map((k) => option({ attrs: { value: k.key, selected: (k.key === key)} }, k.text))
+      ),
     ]
   )
 }

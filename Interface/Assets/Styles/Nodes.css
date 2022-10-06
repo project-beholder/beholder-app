@@ -1,31 +1,47 @@
-
-/* MarkerNode */
-.marker-node {
-  position: absolute;
+/* Base node css */
+.draggable-node {
   top: 0;
   left: 0;
-  height: 130px;
-  width: 130px;
+  position: absolute;
   transform: translate(0, 0);
-  /* transition: transform ease-in-out 30ms; */
   z-index: 10;
-
-  padding: 25px 25px 25px 25px;
+  padding: 5px 10px;
   border: 1px solid #000000;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
-  background-color: #ffffff;
+  background-color: white;
+  color: black;
 }
 
-.marker-node img {
-  width: 80px;
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-  user-drag: none;
+.dark-node {
+  background-color: black;
+  color: white;
 }
 
+.draggable-node span {
+  font-family: sans-serif;
+  font-size: 10px;
+}
+
+.node-select-input {
+  width: 60px;
+  text-align: left;
+  margin-left: 15px;
+}
+
+.selected::before {
+  position: absolute;
+  width: calc(100% + 6px);
+  height: calc(100% + 6px);
+  content: '';
+  background-color: transparent;
+  border: 2px solid gold;
+  border-radius: 5px;
+  top: -5px;
+  left: -5px;
+}
+
+/* Node Output styles */
 .node-outputs {
   position: absolute;
   top: 5%;
@@ -91,84 +107,60 @@
   border-left: 16px solid black;
 }
 
-/* KeyNod */
-.key-node {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 80px;
-  width: 80px;
-  text-align: center;
-  background-color: #ffffff;
-  transform: translate(0, 0);
-  /* transition: transform ease-in-out 30ms; */
-  z-index: 10;
-
-  padding: 20px;
-  border: 1px solid #000000;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 5px;
-}
-
-.key-node h2 {
-  font-family: sans-serif;
-  font-size: 40px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
+/* Node Input styles */
 .node-inputs {
-  position: absolute;
-  top: 5%;
-  left: -70px;
-  height: 90%;
-  padding: 0 18px;
-  width: 70px;
-  border: 1px dashed black;
-  border-right: none;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  z-index: 9;
-  border-radius: 5px 0 0 5px;
+  justify-content: space-around;
   font-family: monospace;
   font-size: 12px;
 }
 
 .input-point {
-  z-index: 20;
-  text-align: left;
   position: relative;
-  cursor: pointer;
   user-select: none;
 }
 
-.input-point.bool-data:after {
+.input-point:after {
   content: '';
-  width: 0px;
-  height: 0px;
+  width: 7px;
+  height: 7px;
   position: absolute;
-  top: 4px;
-  left: -21px;
-  border-top: 4px solid transparent;
-  border-bottom: 4px solid transparent;
-  border-left: 8px solid white;
+  top: 0px;
+  left: -15px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 20px;
+  
 }
-.input-point.bool-data:hover:after {
-  border-left: 8px solid black;
+.input-point:hover:after {
+  /* border-left: 8px solid black; */
 }
 
-
-.input-point.bool-data:before {
-  content: '';
-  width: 0;
-  height: 0;
+/* MarkerNode */
+.marker-node {
   position: absolute;
-  top: -1px;
-  left: -24px;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  border-left: 16px solid black;
+  top: 0;
+  left: 0;
+  height: 130px;
+  width: 130px;
+  transform: translate(0, 0);
+  /* transition: transform ease-in-out 30ms; */
+  z-index: 10;
+
+  padding: 25px 25px 25px 25px;
+  border: 1px solid #000000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  background-color: #ffffff;
 }
+
+.marker-node img {
+  width: 80px;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+

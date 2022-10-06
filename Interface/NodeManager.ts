@@ -1,37 +1,14 @@
 // Lib
 import xs from 'xstream';
-import { div, svg, h, button } from '@cycle/dom';
-import { v4 as uuidv4 } from 'uuid';
+import { div, svg, h, button, select } from '@cycle/dom';
 import * as R from 'ramda';
+import sampleCombine from 'xstream/extra/sampleCombine';
 
 // Local
 import renderNode from './Components/RenderNode';
-import sampleCombine from 'xstream/extra/sampleCombine';
-import UndoRedoManager from './UndoRedoManager';
+import CommandReducer from './CommandReducer';
 
-function distanceSq(x1: number, y1: number, x2: number, y2: number): number {
-  return (x1 - x2) * (x1 - x2) + (y1 - y2) + (y1 - y2);
-}
-
-function createNode(props, uuid) {
-  // Could replace this with an object that has functions for processing
-  switch(props.type) {
-    case 'marker':
-      return {
-        ...props,
-        uuid,
-        output: [],
-      };
-    case 'key':
-      return {
-        ...props,
-        uuid,
-        input: [],
-      };
-  }
-  return null; // this is an error friend
-}
-
+// TODO: Move this to another file
 function renderConnections(nodes) {
   const lines = Object.values(nodes)
     .filter(R.has('output'))
@@ -58,9 +35,30 @@ function renderConnections(nodes) {
 // d="M828.3678124503721,438.92600222891923 C1014.6839062251861,438.92600222891923 1014.6839062251861,225 1201,225"
 
 function NodeManager(sources: any) {
-  const { DOM, mouseUp$, create$, mousePos$ } = sources;
+  const { DOM, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
 
-  const holdNode$ = DOM.select('.draggable-node').events('mousedown')
+  const nodeMouseDown$ = DOM.select('.draggable-node').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev;
+    });
+
+  const clearSelectProxy$ = xs.empty();
+  const singleSelectUUID$ = xs.merge(
+    nodeMouseDown$.map((ev: MouseEvent) => ev.currentTarget?.dataset.uuid),
+    clearSelectProxy$.mapTo(''),
+    xs.of('') // effectively 'start with'
+  );
+
+  const selectCommand$ = singleSelectUUID$.filter((id) => id !== '').map((uuid) => ({ command: 'select', uuid }));
+  const deselectCommand$ = singleSelectUUID$.filter((id) => id === '').mapTo({ command: 'deselect' });
+
+  const deleteCommand$ = globalKeyDown$.filter((ev) => ev.key === 'Backspace')
+    .compose(sampleCombine(singleSelectUUID$))
+    .filter(([_, nodeID]) => (nodeID !== ''))
+    .map(([_, nodeID]) => ({ command: 'delete', uuid: nodeID }));
+
+  const holdNode$ = nodeMouseDown$
     .map((ev: MouseEvent) => {
       const rect = ev.currentTarget.getBoundingClientRect();
       const offsetX = ev.clientX - rect.left;
@@ -73,17 +71,16 @@ function NodeManager(sources: any) {
     });
 
   // UNDO REDO SETUP
-  const cmdZPress$ = DOM.select('document').events('keydown')
+  const cmdZPress$ = globalKeyDown$
     .filter((e) => {
       return (e.key == 'z' && e.metaKey)
     });
   const undo$ = cmdZPress$.filter((e) => (!e.shiftKey)).mapTo({ command: 'undo' });
   const redo$ = cmdZPress$.filter((e) => (e.shiftKey)).mapTo({ command: 'redo' });
 
-  const draggableDown$ = DOM.select('.draggable-node').events('mousedown');
   const draggableUp$ = DOM.select('.draggable-node').events('mouseup')
   const isHeld$ = xs.merge(
-    draggableDown$.mapTo(true),
+    nodeMouseDown$.mapTo(true),
     draggableUp$.mapTo(false),
     mouseUp$.mapTo(false),
   );
@@ -94,94 +91,33 @@ function NodeManager(sources: any) {
   
   const connectProxy$ = xs.create();
 
-  // hack for movement undo
-  const moveEnd$ = xs.combine(mousePos$, isHeld$)
-    .fold((acc, [pos, isHolding]) => {
-      
-      return acc;
-    }, { prevPos: { x: 0, y: 0 }, dist: 0, wasHolding: false, isHolding: false})
-    .filter(({ dist, wasHolding, isHolding }) => (dist > 200 && wasHolding && !isHolding))
-    .mapTo({ command: 'move-end'}).debug();
+  // Individual node events here
+  // is there a way to make this more generic? probably in dataset
+  const keySelect$ = DOM.select('.key-select')
+    .events('change')
+    .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'key', newValue: e.target.value }));
 
   // generate node objects from all of the elements
   // move this to a function + file
-  const nodes$ = xs.merge(create$, move$, connectProxy$, undo$, redo$, moveEnd$)
-    .fold((oldNodes, action) => {
-
-      let nodes = R.clone(oldNodes);
-      switch(action.command) {
-        case 'create':
-          const uuid = uuidv4();
-          nodes[uuid] = createNode(action.props, uuid);
-          globalSendToServer(nodes);
-          UndoRedoManager.pushUndoState(nodes);
-          break;
-        case 'move':
-          nodes[action.props.uuid].x = action.props.x - action.props.offsetX;
-          nodes[action.props.uuid].y = action.props.y - action.props.offsetY;
-          break;
-        case 'connect':
-          const { start, end } = action.props;
-          if (start.type === 'output' && end.type == 'input') {
-            nodes[start.parent].output.push({
-              offsetX: parseFloat(start.offsetX),
-              offsetY: parseFloat(start.offsetY),
-              field: start.name,
-              target: { 
-                ...end,
-                offsetX: parseFloat(end.offsetX),
-                offsetY: parseFloat(end.offsetY),
-              },
-            });
-          } else if (end.type === 'output' && start.type == 'input') {
-            nodes[end.parent].output.push({
-              offsetX: parseFloat(end.offsetX),
-              offsetY: parseFloat(end.offsetY),
-              field: end.name,
-              target: {
-                ...start,
-                offsetX: parseFloat(start.offsetX),
-                offsetY: parseFloat(start.offsetY),
-              },
-            });
-          }
-          globalSendToServer(nodes);
-          UndoRedoManager.pushUndoState(nodes);
-          // only connected 1 way atm, let's see if it works (output -> input)
-          // also should validate if this is any good
-          break;
-        case 'move-end':
-          UndoRedoManager.pushUndoState(nodes);
-          break;
-        case 'undo':
-          if (UndoRedoManager.canUndo()) {
-            nodes = UndoRedoManager.undo();
-            globalSendToServer(nodes);
-          }
-          break;
-        case 'redo':
-          if (UndoRedoManager.canRedo()) {
-            nodes = UndoRedoManager.redo();
-            globalSendToServer(nodes);
-          }
-          break;
-      }
-      return nodes;
-    }, {}).remember();
-  
-  const outputPressed$ = xs.merge(
-      DOM.select('.output-point').events('mousedown'),
-      DOM.select('.input-point').events('mousedown'),
+  const nodes$ = xs.merge(
+      create$,
+      move$,
+      connectProxy$,
+      undo$,
+      redo$,
+      deleteCommand$,
+      selectCommand$,
+      deselectCommand$,
+      keySelect$, // replace when more of this command type come in to play, ie number
     )
+    .fold(CommandReducer, {}).remember();
+  
+  const outputPressed$ = DOM.select('.output-point').events('mousedown')
     .map((ev: MouseEvent) => {
       ev.stopPropagation();
       return ev.target.dataset;
     });
-  const createLineDropped$ = xs.merge(
-      DOM.select('.input-point').events('mouseup'),
-      DOM.select('.output-point').events('mouseup')
-    )
-    .map((ev: MouseEvent) => ev.target.dataset);
+  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
 
   const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), outputPressed$.mapTo(true));
   const previewLine$ = xs.combine(outputPressed$, mousePos$, nodes$, showPreviewLine$)
@@ -206,6 +142,9 @@ function NodeManager(sources: any) {
       //   attrs: { d: "M100,250 C100,100 400,100 400,250" } 
       // }));
 
+  // selection code part 2
+  const clearSelect$ = xs.merge(globalMouseDown$, deleteCommand$)
+  clearSelectProxy$.imitate(clearSelect$);
   
   // this needs to be proxied and turned into a node update
   // lines should be rendered directly from nodes
