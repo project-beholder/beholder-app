@@ -11,6 +11,7 @@ function createNode(props, uuid) {
     case 'marker':
       return {
         ...props,
+        markerID: 0,
         uuid,
         output: [],
         selected: false,
@@ -18,6 +19,7 @@ function createNode(props, uuid) {
     case 'key':
       return {
         ...props,
+        key: 'a',
         uuid,
         input: [],
         selected: false,
@@ -37,8 +39,13 @@ export default function CommandReducer(oldNodes, action) {
       UndoRedoManager.pushUndoState(nodes);
       break;
     case 'move':
-      nodes[action.props.uuid].x = action.props.x - action.props.offsetX;
-      nodes[action.props.uuid].y = action.props.y - action.props.offsetY;
+      R.values(nodes).forEach((n) => {
+        if (n.selected) {
+          // IDK WHY BUT MOVE WAS DOUBLED, MAY NEED TO DO A CHEEKY FOLD
+          n.x += action.dx;
+          n.y += action.dy;
+        }
+      });
       break;
     case 'connect':
       const { start, end } = action.props;
@@ -71,11 +78,13 @@ export default function CommandReducer(oldNodes, action) {
       // also should validate if this is any good
       break;
     case 'select':
-      // deselect all others unless it's a multiselect
-      R.values(nodes).forEach((n) => {
-        n.selected = false;
-      });
-      nodes[action.uuid].selected = true;
+      if (action.uuid === '' || !action.multiselect) {
+        // deselect all others unless it's a multiselect
+        R.values(nodes).forEach((n) => {
+          n.selected = false;
+        });
+      }
+      if (action.uuid !== '') nodes[action.uuid].selected = (!nodes[action.uuid].selected || !action.multiselect);
       break;
     case 'deselect':
       R.values(nodes).forEach((n) => {
@@ -84,10 +93,12 @@ export default function CommandReducer(oldNodes, action) {
       break;
     case 'delete':
       // remove all refs to it
-      R.values(nodes).forEach(() => {
-        console.warn('peter remove connections on delete once connections work again')
+      R.values(nodes).forEach((n) => {
+        console.warn('peter remove connections on delete once connections work again');
+
+        if (n.selected) delete nodes[n.uuid];
       });
-      delete nodes[action.uuid]
+      // delete nodes[action.uuid]
       UndoRedoManager.pushUndoState(nodes);
       break;
     case 'undo':
@@ -105,7 +116,6 @@ export default function CommandReducer(oldNodes, action) {
     case 'value-change':
       nodes[action.uuid][action.prop] = action.newValue;
       UndoRedoManager.pushUndoState(nodes);
-      console.log(nodes);
       globalSendToServer(nodes);
       break;
   }

@@ -15,24 +15,28 @@ function renderConnections(nodes) {
     .map((n) => {
       return n.output // to render I don't need them sorted
         .map((o) => {
-          return h('line.connection-path',
+          const x1 = n.x + o.offsetX;
+          const y1 = n.y + o.offsetY;
+          const x2 = nodes[o.target.parent].x + o.target.offsetX;
+          const y2 = nodes[o.target.parent].y + o.target.offsetY;
+          const curveX = x1 + 30;//x1 + (x2 - x1)/6;
+          const midX = x1 + (x2 - x1)/2;
+          const midY = y1 + (y2 - y1)/2;
+
+          // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
+          // lets make a curve!
+          return h('path.connection-path',
             {
               attrs: {
-                x1: n.x + o.offsetX,
-                y1: n.y + o.offsetY,
-                x2: nodes[o.target.parent].x + o.target.offsetX,
-                y2: nodes[o.target.parent].y + o.target.offsetY,
+                'stroke-linecap': 'round',
+                d: `M ${x1} ${y1} Q ${curveX} ${y1}, ${midX} ${midY} T ${x2} ${y2}`,
+                fill: 'transparent',
               }
-            })
+            });
         });
     });
   return R.flatten(lines);
 }
-// const previewLine$ = xs.of(h('path.preview-path.visible', { attrs: { d: "M 175 200 q 175 200 150 0" } }));
-// const previewLine$ = xs.of(h('path.preview-path.visible', { attrs: { d: "M 0 0 q 150 100 200 200" } }));
-// d="M708.6181124121713,384.29071257403524 C923.9757228727523,384.29071257403524 923.9757228727523,223.5 1139.3333333333333,223.5"
-// const previewLine$ = xs.of(h('line.preview-path.visible', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }));
-// d="M828.3678124503721,438.92600222891923 C1014.6839062251861,438.92600222891923 1014.6839062251861,225 1201,225"
 
 function NodeManager(sources: any) {
   const { DOM, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
@@ -42,16 +46,21 @@ function NodeManager(sources: any) {
       ev.stopPropagation();
       return ev;
     });
+  const nodeMouseUp$ = DOM.select('.draggable-node').events('mouseup')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev;
+    });
 
   const clearSelectProxy$ = xs.empty();
   const singleSelectUUID$ = xs.merge(
-    nodeMouseDown$.map((ev: MouseEvent) => ev.currentTarget?.dataset.uuid),
-    clearSelectProxy$.mapTo(''),
-    xs.of('') // effectively 'start with'
+    nodeMouseUp$.map((ev: MouseEvent) => [ev.currentTarget?.dataset.uuid, ev.shiftKey]),
+    clearSelectProxy$.mapTo(['', false]),
+    xs.of(['', false]) // effectively 'start with'
   );
 
-  const selectCommand$ = singleSelectUUID$.filter((id) => id !== '').map((uuid) => ({ command: 'select', uuid }));
-  const deselectCommand$ = singleSelectUUID$.filter((id) => id === '').mapTo({ command: 'deselect' });
+  const selectCommand$ = singleSelectUUID$.map(([uuid, multiselect]) => ({ command: 'select', uuid, multiselect }));
+  const deselectCommand$ = xs.empty();//singleSelectUUID$.filter(([id]) => id === '').mapTo({ command: 'deselect' });
 
   const deleteCommand$ = globalKeyDown$.filter((ev) => ev.key === 'Backspace')
     .compose(sampleCombine(singleSelectUUID$))
@@ -78,16 +87,15 @@ function NodeManager(sources: any) {
   const undo$ = cmdZPress$.filter((e) => (!e.shiftKey)).mapTo({ command: 'undo' });
   const redo$ = cmdZPress$.filter((e) => (e.shiftKey)).mapTo({ command: 'redo' });
 
-  const draggableUp$ = DOM.select('.draggable-node').events('mouseup')
   const isHeld$ = xs.merge(
     nodeMouseDown$.mapTo(true),
-    draggableUp$.mapTo(false),
+    nodeMouseUp$.mapTo(false),
     mouseUp$.mapTo(false),
   );
 
   const move$ = xs.combine(mousePos$, holdNode$, isHeld$)
     .filter(R.nth(2))
-    .map(([pos, held]) => ({ command: 'move', props: { ...held, ...pos } }));
+    .map(([pos, held]) => ({ command: 'move', ...pos }));
   
   const connectProxy$ = xs.create();
 
@@ -119,24 +127,33 @@ function NodeManager(sources: any) {
     });
   const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
 
-  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), outputPressed$.mapTo(true));
+  // needs to hide on mouse up and when a connection is made, but show when an output is clicked
+  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true));
   const previewLine$ = xs.combine(outputPressed$, mousePos$, nodes$, showPreviewLine$)
       .map(([data, mouse, nodes, show]) => {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
         const heldNode = nodes[data.parent];
 
-        if (heldNode) {
-          return h('line.preview-path',
-            {
-              class: { visible: show },
-              attrs: {
-                x1: heldNode.x + offsetX, y1: heldNode.y + offsetY,
-                x2: mouse.x, y2: mouse.y
-              }
-            });
-        }
-        return h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } })
+        const x1 = heldNode.x + offsetX;
+        const y1 = heldNode.y + offsetY;
+        const x2 = mouse.x;
+        const y2 = mouse.y;
+        const midX = x1 + (x2 - x1)/2;
+        const midY = y1 + (y2 - y1)/2;
+        const curveX = Math.abs(x2 - x1) > 5 ? x1 + 30 : x1;//x1 + (x2 - x1)/6;
+
+        // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
+        // lets make a curve!
+        return h('path.preview-path',
+          {
+            class: { visible: show },
+            attrs: {
+              'stroke-linecap': 'round',
+              d: `M ${x1} ${y1} Q ${curveX} ${y1}, ${midX} ${midY} T ${x2} ${y2}`,
+              fill: 'transparent',
+            },
+          });
       }).startWith(h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }))
       // .mapTo(h('path.preview-path.visible', {
       //   attrs: { d: "M100,250 C100,100 400,100 400,250" } 
@@ -164,9 +181,12 @@ function NodeManager(sources: any) {
       ]);
     });
 
+  // need this because I am stopping propoggation
+  const capturedClicks$ = xs.merge(nodeMouseDown$, outputPressed$);
 
   const sinks = {
     DOM: vdom$,
+    capturedClicks$,
   }
   return sinks;
 }

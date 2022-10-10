@@ -5,8 +5,8 @@
   position: absolute;
   transform: translate(0, 0);
   z-index: 10;
-  padding: 5px 10px;
-  border: 1px solid #000000;
+  padding: 10px 10px;
+  border: 1px solid lightgray;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
   background-color: white;
@@ -39,25 +39,17 @@
   border-radius: 5px;
   top: -5px;
   left: -5px;
+  z-index: -1;
 }
 
 /* Node Output styles */
 .node-outputs {
-  position: absolute;
-  top: 5%;
-  right: -90px;
-  height: 90%;
-  padding: 0 15px;
-  width: 90px;
-  border: 1px dashed black;
-  border-left: none;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  z-index: 9;
-  border-radius: 0 5px 5px 0;
+  justify-content: flex-end;
   font-family: monospace;
   font-size: 12px;
+  vertical-align: bottom;
 }
 
 .output-point {
@@ -68,52 +60,31 @@
   user-select: none;
 }
 
-.output-point.number-data:after {
-  width: 11px;
-  height: 11px;
+.output-point:after {
   content: '';
-  background-color: black;
-  border-radius: 20px;
-  right: -22px;
-  top: 2px;
-  display: block;
-  position: absolute;
-  border: 1px solid white;
-}
-
-.output-point.number-data:hover:after { border: 1px solid black; }
-
-.output-point.bool-data:after {
-  content: '';
-  width: 0px;
-  height: 0px;
-  position: absolute;
-  top: 1px;
-  right: -24px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-left: 13px solid black;
-}
-
-.output-point.bool-data:hover:before {
-  content: '';
-  width: 0;
-  height: 0;
+  width: 7px;
+  height: 7px;
   position: absolute;
   top: 0px;
-  right: -26px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left: 16px solid black;
+  right: -15px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 20px;
 }
+
+.output-point:hover:after {
+  background-color: black;
+}
+
 
 /* Node Input styles */
 .node-inputs {
   display: inline-flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-end;
   font-family: monospace;
   font-size: 12px;
+  vertical-align: bottom;
 }
 
 .input-point {
@@ -131,36 +102,21 @@
   background-color: white;
   border: 2px solid black;
   border-radius: 20px;
-  
 }
+
 .input-point:hover:after {
   /* border-left: 8px solid black; */
 }
 
 /* MarkerNode */
-.marker-node {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 130px;
-  width: 130px;
-  transform: translate(0, 0);
-  /* transition: transform ease-in-out 30ms; */
-  z-index: 10;
-
-  padding: 25px 25px 25px 25px;
-  border: 1px solid #000000;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 5px;
-  background-color: #ffffff;
-}
-
-.marker-node img {
+.marker-node-img {
   width: 80px;
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
   user-drag: none;
+  margin: 0 15px;
+  vertical-align: bottom;
 }
 
