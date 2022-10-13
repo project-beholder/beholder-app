@@ -19,7 +19,7 @@ function renderConnections(nodes) {
           const y1 = n.y + o.offsetY;
           const x2 = nodes[o.target.parent].x + o.target.offsetX;
           const y2 = nodes[o.target.parent].y + o.target.offsetY;
-          const curveX = x1 + 30;//x1 + (x2 - x1)/6;
+          const curveX = x1 + 30; // x1 + (x2 - x1)/6;
           const midX = x1 + (x2 - x1)/2;
           const midY = y1 + (y2 - y1)/2;
 
@@ -52,20 +52,23 @@ function NodeManager(sources: any) {
       return ev;
     });
 
+
+  // get a proxy of all the nodes
+  // if more than 1 selected: mouse up sends single select events and mouse down only sends on multiselect
+  
+  // ok so things are weird, I need a list of currently selected elements so I need a proxy for it
+  const selectedProxy$ = xs.create();
   const clearSelectProxy$ = xs.empty();
   const singleSelectUUID$ = xs.merge(
-    nodeMouseUp$.map((ev: MouseEvent) => [ev.currentTarget?.dataset.uuid, ev.shiftKey]),
-    clearSelectProxy$.mapTo(['', false]),
-    xs.of(['', false]) // effectively 'start with'
+    nodeMouseDown$.map((ev) => [ev.currentTarget?.dataset.uuid, ev.shiftKey, 'down']),
+    nodeMouseUp$.map((ev) => [ev.currentTarget?.dataset.uuid, ev.shiftKey, 'up']),
+    clearSelectProxy$.mapTo(['', false, 'down']),
+    xs.of(['', false, 'down']) // effectively 'start with'
   );
 
-  const selectCommand$ = singleSelectUUID$.map(([uuid, multiselect]) => ({ command: 'select', uuid, multiselect }));
-  const deselectCommand$ = xs.empty();//singleSelectUUID$.filter(([id]) => id === '').mapTo({ command: 'deselect' });
+  const selectCommand$ = singleSelectUUID$.map(([uuid, multiselect, mButton]) => ({ command: 'select', uuid, multiselect, mButton }));
 
-  const deleteCommand$ = globalKeyDown$.filter((ev) => ev.key === 'Backspace')
-    .compose(sampleCombine(singleSelectUUID$))
-    .filter(([_, nodeID]) => (nodeID !== ''))
-    .map(([_, nodeID]) => ({ command: 'delete', uuid: nodeID }));
+  const deleteCommand$ = globalKeyDown$.filter((ev) => ev.key === 'Backspace').mapTo({ command: 'delete' });
 
   const holdNode$ = nodeMouseDown$
     .map((ev: MouseEvent) => {
@@ -101,9 +104,9 @@ function NodeManager(sources: any) {
 
   // Individual node events here
   // is there a way to make this more generic? probably in dataset
-  const keySelect$ = DOM.select('.key-select')
+  const nodeValueChange$ = DOM.select('.node-input')
     .events('change')
-    .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'key', newValue: e.target.value }));
+    .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: e.target.value }));
 
   // generate node objects from all of the elements
   // move this to a function + file
@@ -115,8 +118,7 @@ function NodeManager(sources: any) {
       redo$,
       deleteCommand$,
       selectCommand$,
-      deselectCommand$,
-      keySelect$, // replace when more of this command type come in to play, ie number
+      nodeValueChange$, // replace when more of this command type come in to play, ie number
     )
     .fold(CommandReducer, {}).remember();
   
@@ -154,10 +156,7 @@ function NodeManager(sources: any) {
               fill: 'transparent',
             },
           });
-      }).startWith(h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }))
-      // .mapTo(h('path.preview-path.visible', {
-      //   attrs: { d: "M100,250 C100,100 400,100 400,250" } 
-      // }));
+      }).startWith(h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }));
 
   // selection code part 2
   const clearSelect$ = xs.merge(globalMouseDown$, deleteCommand$)
@@ -174,6 +173,7 @@ function NodeManager(sources: any) {
     .map(([nodes, previewLine]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
+
       // do svg lines here from nodes data
       return div([
         ...Object.values(nodes).map(renderNode), // render nodes

@@ -59,7 +59,7 @@ function runKeyEmulation() {
     .forEach((node) => {
       node.output.forEach((out) => {
         console.log(out.target);
-        updateNode(programGraph[out.target.parent], markers[node.markerID][out.field]);
+        updateNode(programGraph[out.target.parent], markers[node.ID][out.field]);
       });
     });
 }
@@ -76,7 +76,7 @@ ipcMain.on('update_program_graph', (event, arg) => {
   // x: 318
   // y: 260
 // d7797737-8fd7-4233-b15c-598f7e6484aa:
-  // markerID: 0
+  // ID: 0
   // output: [
     // 0: {offsetX: 106, offsetY: 84, field: 'rotation', target: {…}}
   // ]

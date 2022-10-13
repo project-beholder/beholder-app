@@ -18,8 +18,9 @@ function view(display$, position$) {
         style: { transform: `translate(${position.x}px, ${position.y}px)` }
       },
       [
-        div('.palette-category', ['MARKER', ul([button('#create-marker.create-button', { dataset: { type: 'marker' } }, 'Detect Marker')])]),
-        div('.palette-category', ['KEYS', ul([button('#create-key.create-button', { dataset: { type: 'key' } }, 'Send Key')])]),
+        div('.palette-category', ['VARIABLES', ul([button('.create-button', { dataset: { type: 'number' } }, 'Number')])]),
+        div('.palette-category', ['MARKER', ul([button('.create-button', { dataset: { type: 'marker' } }, 'Detect Marker')])]),
+        div('.palette-category', ['KEYS', ul([button('.create-button', { dataset: { type: 'key' } }, 'Send Key')])]),
       ]
     )
   );
@@ -41,16 +42,10 @@ export default function NodePalette(sources: any) {
   //   .map(([_, position]) => ({ command: 'create', props: { type: 'marker', ...position } }));
 
   const starterCreate$ = xs.empty();
-  // const starterCreate$ = xs.from([
-  //   { command: 'create', props: { type: 'key', x: 100, y: 100 } },
-  //   { command: 'create', props: { type: 'marker', x: 10, y: 10 } },
-  // ])
   const create$ = xs.merge(
     createButtonPress$,
     starterCreate$,
   ).remember(); // needs to be a memory stream for some reason
-  // .startWith({ command: 'create', props: { type: 'key', key: 'x', x: 10, y: 10 } });
-  // .startWith({ command: 'create', props: { type: 'marker', markerID: 0, x: 10, y: 10 } });
   
   // hack to stop bubbling from hiding this menu
   DOM.select('#node-palette')

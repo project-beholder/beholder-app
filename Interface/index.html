@@ -9,13 +9,7 @@
   </head>
   <body>
     <section id="main-app"></section>
-    <span id="ip-address"></span>
-    <!-- <h1 id="debug">up</h1> -->
     <script>
-      // ts don't like this so this is a workaround. Will make these global functions if necessary
-      const address = require('address');
-      document.querySelector('#ip-address').dataset.value = address.ip();
-      
       const { ipcRenderer } = require('electron');
       function globalSendToServer(json) {
         // console.warn()
