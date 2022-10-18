@@ -43,5 +43,5 @@ app.on("window-all-closed", () => {
   // }
 });
 
-// run udp server
-// require('./UDPManager.js');
+// run actual background app
+require('./Native/ProgramManager.js');

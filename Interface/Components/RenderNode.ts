@@ -62,8 +62,23 @@ export function NumberNode(props) {
   )
 }
 
-export function CharNode(node) {
-  
+export function DetectionPanel(props) {
+  const { uuid } = props;
+  return div('.draggable-node.detection-panel', [
+      div('.detection-view', 'hide-me peter'), // position this absolute, kthanks
+      select(
+        '.detection-select.camera-select',
+        { dataset: { uuid: 'detection-panel' } },
+        [
+          option({ attrs: { value: 0, selected: true } }, 'Camera 1'),
+          option({ attrs: { value: 0, selected: false } }, 'Camera 2')
+        ]
+      ),
+      div('.node-outputs.center-outputs', [
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '72', offsetY: '23.5' } }, '')
+      ]),
+    ]
+  );
 }
 
 export default function renderNode(node) {
@@ -71,7 +86,7 @@ export default function renderNode(node) {
     case 'marker': return MarkerNode(node);
     case 'key': return KeyNode(node);
     case 'number': return NumberNode(node);
-    case 'char': return CharNode(node);
-    default: return div('.null');
+    case 'detection': return DetectionPanel(node);
+    default: return '';
   }
 }

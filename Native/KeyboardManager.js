@@ -31,7 +31,7 @@ function releaseKey(key) {
 
 
 function init() {
-  keyThread = spawn(path.join(__dirname, './build/keyboardEmulation'));
+  keyThread = spawn(path.join(__dirname, './KeyboardEmulation/build/keyboardEmulation'));
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
       console.log(`stdout: ${rawData}`);
@@ -45,10 +45,6 @@ function init() {
       console.log('Killing child process');
       keyThread.kill();
   });
-  
-  pressKey('↑');
 }
 
-init();
-
-module.exports = { init };
+module.exports = { init, pressKey, releaseKey };
