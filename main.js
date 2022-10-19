@@ -42,6 +42,3 @@ app.on("window-all-closed", () => {
     app.quit();
   // }
 });
-
-// run actual background app
-require('./Native/ProgramManager.js');

@@ -32,18 +32,31 @@ function createNode(props, uuid) {
         output: [],
         selected: false,
       }
+    case 'detection':
+      return {
+        ...props,
+        camID: 0,
+        uuid,
+        output: [],
+        selected: false,
+      }
   }
   return null; // this is an error friend
 }
 
+// This is a giant function :()
+// maybe turn into a map, that just returns based on key. Only local var is "nodes"
 export default function CommandReducer(oldNodes, action) {
   let nodes = R.clone(oldNodes);
 
   switch(action.command) {
     case 'create':
+      if (action.props.type === 'detection' && R.values(nodes).filter(R.propEq('type', 'detection')).length == 1) {
+        console.warn(`can't have 2 detection feeds atm`);
+        return nodes; // bail if trying to create another detection node
+      }
       const uuid = uuidv4();
       nodes[uuid] = createNode(action.props, uuid);
-      globalSendToServer(nodes);
       UndoRedoManager.pushUndoState(nodes);
       break;
     case 'move':
@@ -72,7 +85,6 @@ export default function CommandReducer(oldNodes, action) {
           nodes[start.parent][start.name] = nodes[end.parent].value;
         }
       }
-      globalSendToServer(nodes);
       UndoRedoManager.pushUndoState(nodes);
       // only connected 1 way atm, let's see if it works (output -> input)
       // also should validate if this is any good
@@ -125,18 +137,15 @@ export default function CommandReducer(oldNodes, action) {
       });
       // delete nodes[action.uuid]
       UndoRedoManager.pushUndoState(nodes);
-      globalSendToServer(nodes);
       break;
     case 'undo':
       if (UndoRedoManager.canUndo()) {
         nodes = UndoRedoManager.undo();
-        globalSendToServer(nodes);
       }
       break;
     case 'redo':
       if (UndoRedoManager.canRedo()) {
         nodes = UndoRedoManager.redo();
-        globalSendToServer(nodes);
       }
       break;
     case 'value-change':
@@ -150,7 +159,6 @@ export default function CommandReducer(oldNodes, action) {
           nodes[o.target.parent][o.target.name] = action.newValue
         });
       }
-      globalSendToServer(nodes);
       break;
   }
   return nodes;

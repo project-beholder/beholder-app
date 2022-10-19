@@ -1,67 +1,68 @@
 function getKeyCode(key) {
   switch (key) {
-    case 'a': return 1;
-    case 's': return 2;
-    case 'd': return 3;
-    case 'f': return 4;
-    case 'h': return 5;
-    case 'g': return 6;
-    case 'z': return 7;
-    case 'x': return 8;
-    case 'c': return 9;
-    case 'v': return 'a';
+    case 'a': return 0x00;
+    case 's': return 0x01;
+    case 'd': return 0x02;
+    case 'f': return 0x03;
+    case 'h': return 0x04;
+    case 'g': return 0x05;
+    case 'z': return 0x06;
+    case 'x': return 0x07;
+    case 'c': return 0x08;
+    case 'v': return 0x09;
 
-    case 'b': return 'b';
-    case 'q': return 'c';
-    case 'w': return 'd';
-    case 'e': return 'e';
-    case 'r': return 'f';
-    case 'y': return 10;
-    case 't': return 11;
-    case '1': return 12;
-    case '2': return 13;
-    case '3': return 14;
+    case 'b': return 0x0B;
+    case 'q': return 0x0C;
+    case 'w': return 0x0D;
+    case 'e': return 0x0E;
+    case 'r': return 0x0F;
+    case 'y': return 0x10;
+    case 't': return 0x11;
+    case '1': return 0x12;
+    case '2': return 0x13;
+    case '3': return 0x14;
 
-    case '4': return 15;
-    case '6': return 16;
-    case '5': return 17;
-    case '=': return 18;
-    case '9': return 19;
-    case '7': return '1a';
-    case '-': return '1b';
-    case '8': return '1c';
-    case '0': return '1d';
-    case ']': return '1e';
+    case '4': return 0x15;
+    case '6': return 0x16;
+    case '5': return 0x17;
+    case '=': return 0x18;
+    case '9': return 0x19;
+    case '7': return 0x1A;
+    case '-': return 0x1B;
+    case '8': return 0x1C;
+    case '0': return 0x1D;
+    case ']': return 0x1E;
 
-    case 'o': return '1f';
-    case 'u': return 20;
-    case '[': return 21;
-    case 'i': return 22;
-    case 'p': return 23;
-    case 'RETURN': return 24;
-    case 'l': return 25;
-    case 'j': return 26;
-    case "'": return 27;
-    case 'k': return 28;
+    case 'o': return 0x1F;
+    case 'u': return 0x20;
+    case '[': return 0x21;
+    case 'i': return 0x22;
+    case 'p': return 0x23;
+    case 'RETURN': return 0x24;
+    case 'l': return 0x25;
+    case 'j': return 0x26;
+    case "'": return 0x27;
+    case 'k': return 0x28;
 
-    case ';': return 29;
-    case '\\': return '2a';
-    case ',': return '2b';
-    case '/': return '2c';
-    case 'n': return '2d';
-    case 'm': return '2e';
-    case '.': return '2f';
-    case 'TAB': return 30;
-    case 'SPACE': return 31;
-    case '`': return 32;
+    case ';': return 0x29;
+    case '\\': return 0x2A;
+    case ',': return 0x2B;
+    case '/': return 0x2C;
+    case 'n': return 0x2D;
+    case 'm': return 0x2E;
+    case '.': return 0x2F;
+    case 'TAB': return 0x30;
+    case 'SPACE': return 0x31;
+    case '~': return 0x32;
+    case 'DELETE': return 0x33;
+    case 'ESC': return 0x35;
 
-    case '←': return '7b';
-    case '→': return '7c';
-    case '↓': return '7d';
-    case '↑': return '7e';
+    case '←': return 0x7B;
+    case '→': return 0x7C;
+    case '↓': return 0x7D;
+    case '↑': return 0x7E;
   }
 }
-
 
 // https://stackoverflow.com/questions/1918841/how-to-convert-ascii-character-to-cgkeycode/14529841#14529841][1]
 module.exports = getKeyCode;

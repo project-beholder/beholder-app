@@ -132,3 +132,31 @@
   text-align: right;
   /* padding-right: 5px; */
 }
+
+/* detection panel */
+.detection-panel {
+  width: 300px;
+}
+
+.detection-panel .output-point {
+  position: absolute;
+  right: 9px;
+}
+
+.labeled-select {
+  margin-top: 179px;
+}
+.select-label {
+  margin-right: 5px;
+}
+
+.detection-view {
+  width: 100%;
+  background: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 3px 3px 0 0;
+}
+
+/* 240 : 480 for  aspect ratio */

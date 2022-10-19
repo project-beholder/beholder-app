@@ -9,14 +9,8 @@
   </head>
   <body>
     <section id="main-app"></section>
-    <script>
-      const { ipcRenderer } = require('electron');
-      function globalSendToServer(json) {
-        // console.warn()
-        // ipcRenderer.send('update_program_graph', json);
-      }
-      // setTimeout(() => ipcRenderer.send('key_press', 7), 5000);
-    </script>
+    <script src="./ProgramDriver.js"></script>
+    <script src="./WebcamDetectionDriver.js"></script>
     <script src="../dist/bundle.js"></script>
   </body>
 </html>

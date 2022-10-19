@@ -187,6 +187,7 @@ function NodeManager(sources: any) {
   const sinks = {
     DOM: vdom$,
     capturedClicks$,
+    nodes$,
   }
   return sinks;
 }

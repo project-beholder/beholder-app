@@ -37,7 +37,7 @@ class Marker {
   }
 
   update(m) {
-    const [id, x, y, rotation] = m;
+    const { id, x, y, rotation } = m;
     this.timestamp = 0;
     this.present = true;
 

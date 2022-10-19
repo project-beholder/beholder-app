@@ -42,7 +42,7 @@ function main(sources: any) {
     .startWith({ display: false, position: { x: 0, y: 0 } });
 
   const palette = NodePalette({ DOM: sources.DOM, props$: paletteProp$ });
-  const nodeManager = NodeManager({ DOM: sources.DOM, mouseUp$, globalMouseDown$, globalKeyDown$, mousePos$, create$: palette.create$ });
+  const nodeManager = NodeManager({ ...sources, mouseUp$, globalMouseDown$, globalKeyDown$, mousePos$, create$: palette.create$ });
 
   paletteHideProxy$.imitate(xs.merge(
     nodeManager.capturedClicks$,
@@ -57,9 +57,18 @@ function main(sources: any) {
       ])
     );
 
+  // Peak at the detection driver
+  sources.WebcamDetection.subscribe({
+    next: (m) => { return; },
+  });
+
   return {
-    DOM: vdom$
+    DOM: vdom$,
+    WebcamDetection: xs.empty(),
+    ProgramManager: nodeManager.nodes$,
   };
 }
 
-run(main, { DOM: makeDOMDriver('#main-app') });
+// console.log(makeWebcamDetectionDriver);
+
+run(main, { DOM: makeDOMDriver('#main-app'),  WebcamDetection: WebcamDetectionDriver, ProgramManager: ProgramDriver });

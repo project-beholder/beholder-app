@@ -33,7 +33,7 @@ export function KeyNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '1.5', offsetY: '24.5' } }, 'SEND')
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '1.5', offsetY: '24.5' } }, 'PRESS')
       ]),
       select(
         '.node-input.node-select-input.key-select',
@@ -63,19 +63,24 @@ export function NumberNode(props) {
 }
 
 export function DetectionPanel(props) {
-  const { uuid } = props;
-  return div('.draggable-node.detection-panel', [
+  const { uuid, selected, x, y } = props;
+  return div('.draggable-node.detection-panel',
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    [
       div('.detection-view', 'hide-me peter'), // position this absolute, kthanks
-      select(
-        '.detection-select.camera-select',
-        { dataset: { uuid: 'detection-panel' } },
-        [
-          option({ attrs: { value: 0, selected: true } }, 'Camera 1'),
-          option({ attrs: { value: 0, selected: false } }, 'Camera 2')
-        ]
-      ),
-      div('.node-outputs.center-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '72', offsetY: '23.5' } }, '')
+      div('.labeled-select', [
+        span('.select-label', 'CAMERA'),
+        select(
+          '.detection-select.camera-select',
+          { dataset: { uuid: 'detection-panel' } },
+          [
+            option({ attrs: { value: 0, selected: true } }, 'Camera 1'),
+            option({ attrs: { value: 0, selected: false } }, 'Camera 2')
+          ]
+        ),
+      ]),
+      div('.node-outputs', [
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '299', offsetY: '222' } }, 'FEED')
       ]),
     ]
   );

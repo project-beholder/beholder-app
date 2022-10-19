@@ -3,17 +3,7 @@ const path = require('path');
 
 const getKeyCode = require('./MacKeyMap.js');
 
-
-
 let keyThread;
-// Marker stuff
-let prevTime = Date.now();
-
-function loop() {
-  keyThread.stdin.cork();
-  keyThread.stdin.write('000\r\n');
-  keyThread.stdin.uncork();
-}
 
 function pressKey(key) {
   const hex = getKeyCode(key);
@@ -28,7 +18,6 @@ function releaseKey(key) {
   keyThread.stdin.write(`R:${hex}\r\n`);
   keyThread.stdin.uncork();
 }
-
 
 function init() {
   keyThread = spawn(path.join(__dirname, './KeyboardEmulation/build/keyboardEmulation'));

@@ -21,6 +21,7 @@ function view(display$, position$) {
         div('.palette-category', ['VARIABLES', ul([button('.create-button', { dataset: { type: 'number' } }, 'Number')])]),
         div('.palette-category', ['MARKER', ul([button('.create-button', { dataset: { type: 'marker' } }, 'Detect Marker')])]),
         div('.palette-category', ['KEYS', ul([button('.create-button', { dataset: { type: 'key' } }, 'Send Key')])]),
+        div('.palette-category', ['DETECTION', ul([button('.create-button', { dataset: { type: 'detection' } }, 'Webcam Detection')])]),
       ]
     )
   );
