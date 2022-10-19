@@ -29,7 +29,7 @@ function WebcamDetectionDriver(sinks) {
 
     detectFrameTime -= dt;
     if (detectFrameTime <= 0) {
-      detectFrameTime = 50; // Detection FPS HERE
+      detectFrameTime = 30; // Detection FPS HERE
 
       detectThread.stdin.cork();
       detectThread.stdin.write('001\r\n');
@@ -62,25 +62,10 @@ function WebcamDetectionDriver(sinks) {
         listener.next(markers);
       }
 
-      let textBuffer = '';
-      console.log(detectThread);
       detectThread.stdout.on('data', (rawData) => {
-        // const dataString = rawData.toString();
-        // if (dataString.charAt(0) == '{') {
-        //   console.log(rawData.length)
-        //   if (rawData.length > 0) {
-        //     // console.log(textBuffer);
-        //     const data = JSON.parse(textBuffer);
-        //     // console.log(data);
-        //   }
-        //   textBuffer = '';
-        // }
-        // textBuffer += dataString;
-
-          // put for img src "data:image/png;base64,......"
-          const data = JSON.parse(rawData);
-          console.log(data);
-          // if (data.markers) updateMarkers(data.markers);
+        const data = JSON.parse(rawData);
+        if (data.markers) updateMarkers(data.markers);
+        
       });
 
       // start the detection parade

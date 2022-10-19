@@ -23,10 +23,10 @@ function releaseKey(key) {
 function initKeyboard() {
   keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
   keyThread.stdin.setDefaultEncoding('utf-8');
-  keyThread.stdout.on('data', (rawData) => {
-      console.log(`stdout keyboard: ${rawData}`);
-      // const data = JSON.parse(rawData);
-  });
+  // keyThread.stdout.on('data', (rawData) => {
+  //     // console.log(`stdout keyboard: ${rawData}`);
+  //     // const data = JSON.parse(rawData);
+  // });
   
   // Make sure to kill the child process on exit or mem leak
   process.on('SIGINT', () => { process.exit(0); });

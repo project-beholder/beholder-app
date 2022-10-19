@@ -5,7 +5,7 @@
   display: none;
   z-index: 100;
 
-  font-family: sans-serif;
+  /* font-family: sans-serif; */
 }
 
 #node-palette.display {
@@ -31,7 +31,7 @@
   position: absolute;
   left: 100px;
   top: 0px;
-  width: 100px;
+  /* width: 100px; */
 }
 
 .palette-category:hover {
@@ -42,14 +42,23 @@
 
 .palette-category:hover > ul {
   display: block;
+  background-color: black;
 }
 
 .palette-category button {
   border: none;
   padding: 5px;
-  background-color: black;
+  /* background-color: black; */
+  width: 120px;
+  text-align: left;
+  background-color: transparent;
   color: white;
-  font-family: sans-serif;
-  font-size: 16px;
+  font-size: 12px;
   border-bottom: 1px solid lightgray;
+  min-width: max-content;
+  cursor: pointer;
+}
+
+.palette-category button:hover {
+  font-weight: 600;
 }

@@ -39,7 +39,7 @@ function renderConnections(nodes) {
 }
 
 function NodeManager(sources: any) {
-  const { DOM, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
+  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
 
   const nodeMouseDown$ = DOM.select('.draggable-node').events('mousedown')
     .map((ev: MouseEvent) => {
@@ -169,14 +169,23 @@ function NodeManager(sources: any) {
       .map(([start, end]) => ({ command: 'connect', props: { start, end } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   
-  const vdom$ = xs.combine(nodes$, previewLine$)
-    .map(([nodes, previewLine]) => {
+  const frame$ = WebcamDetection.fold(
+    ([dt, prevTime]) => {
+      const currTime = Date.now();
+      let newDT = currTime - prevTime;
+      if (dt < 50) return [dt + newDT, currTime];
+      return [0, currTime];
+    }, [0,0])
+    .filter(([dt]) => (dt == 0))
+    .map(() => `../frame.jpg?${Date.now()}`);
+  const vdom$ = xs.combine(nodes$, previewLine$, frame$)
+    .map(([nodes, previewLine, frame]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
 
       // do svg lines here from nodes data
       return div([
-        ...Object.values(nodes).map(renderNode), // render nodes
+        ...Object.values(nodes).map((n) => renderNode(n, frame)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });
