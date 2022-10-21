@@ -38,10 +38,10 @@ export const KEY_MAPPINGS = [
   { key: '9', text: '9' },
   
   { key: 'SPACE', text: 'SPACE' },
-  { key: 'UP', text: '↑' },
-  { key: 'DOWN', text: '↓' },
-  { key: 'LEFT', text: '←' },
-  { key: 'RIGHT', text: '→' },
+  { key: '↓', text: '↓' },
+  { key: '↓', text: '↓' },
+  { key: '←', text: '←' },
+  { key: '→', text: '→' },
 
   // Missing: ESC, ENTER, SHIFT, CMD/CTRL, ALT, TAB, DELETE/BACKSPACE
 ];

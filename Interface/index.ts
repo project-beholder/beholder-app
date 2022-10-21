@@ -62,9 +62,12 @@ function main(sources: any) {
     next: (m) => { return; },
   });
 
+  const feedChange$ = DOM.select('.camera-select').events('change').map((ev) => ({ type: 'camera-feed', value: ev.target.value }));
+  const flipCamera$ = DOM.select('.camera-flip').events('change').map((ev) => ({ type: 'flip', value: ev.target.checked ? 1 : 0 }));
+
   return {
     DOM: vdom$,
-    WebcamDetection: xs.empty(),
+    WebcamDetection: xs.merge(feedChange$, flipCamera$),
     ProgramManager: nodeManager.nodes$,
   };
 }

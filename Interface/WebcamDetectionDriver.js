@@ -4,13 +4,30 @@ const Vec2 = require('./Utils/Vec2.js');
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
-function WebcamDetectionDriver(sinks) {
+function WebcamDetectionDriver(cameraFeedChanges$) {
   // Marker stuff
   const markers = [];
   for (let i = 0; i < 1000; i++) {
     // We are keeping tabs on 1000 markers... should be fine since they are not present but...
     markers.push(new Marker(i));
   }
+
+  let shouldFlip = 0;
+  cameraFeedChanges$.subscribe({
+    next: ({ type, value }) => {
+      switch(type) {
+        case 'camera-feed':
+          detectThread.stdin.cork();
+          // console.log(value)
+          detectThread.stdin.write(`10${value}0\r\n`);
+          detectThread.stdin.uncork();
+          break;
+        case 'flip':
+          shouldFlip = value;
+          break;
+      }
+    },
+  })
 
   // detection thread init
   const detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
@@ -29,10 +46,10 @@ function WebcamDetectionDriver(sinks) {
 
     detectFrameTime -= dt;
     if (detectFrameTime <= 0) {
-      detectFrameTime = 30; // Detection FPS HERE
+      detectFrameTime = 50; // Detection FPS HERE
 
       detectThread.stdin.cork();
-      detectThread.stdin.write('001\r\n');
+      detectThread.stdin.write(`001${shouldFlip}\r\n`);
       detectThread.stdin.uncork();
     }
   }

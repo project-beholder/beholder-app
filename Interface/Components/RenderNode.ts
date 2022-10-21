@@ -77,13 +77,17 @@ export function DetectionPanel(props, frame) {
           '.detection-select.camera-select',
           { dataset: { uuid: 'detection-panel' } },
           [
-            option({ attrs: { value: 0, selected: true } }, 'Camera 1'),
-            option({ attrs: { value: 0, selected: false } }, 'Camera 2')
+            option({ attrs: { value: 0 } }, 'Camera 1'),
+            option({ attrs: { value: 1 } }, 'Camera 2')
           ]
         ),
       ]),
+      div('labelded-select', [
+        span('.select-label', 'flip'),
+        input('.detection-check.camera-flip', { attrs: { type: 'checkbox' }})
+      ]),
       div('.node-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '320.5', offsetY: '236.5' } }, 'FEED')
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '320.5', offsetY: '252.5' } }, 'FEED')
       ]),
     ]
   );

@@ -67,7 +67,6 @@ function NodeManager(sources: any) {
   );
 
   const selectCommand$ = singleSelectUUID$.map(([uuid, multiselect, mButton]) => ({ command: 'select', uuid, multiselect, mButton }));
-
   const deleteCommand$ = globalKeyDown$.filter((ev) => ev.key === 'Backspace').mapTo({ command: 'delete' });
 
   const holdNode$ = nodeMouseDown$
@@ -173,7 +172,7 @@ function NodeManager(sources: any) {
     ([dt, prevTime]) => {
       const currTime = Date.now();
       let newDT = currTime - prevTime;
-      if (dt < 50) return [dt + newDT, currTime];
+      if (dt < 200) return [dt + newDT, currTime];
       return [0, currTime];
     }, [0,0])
     .filter(([dt]) => (dt == 0))
