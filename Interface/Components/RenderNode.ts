@@ -1,6 +1,7 @@
 import { div, img, span, h2, select, option, input } from '@cycle/dom';
 
 import { KEY_MAPPINGS } from '../Constants/Keys';
+import generateArucoMarkerGraphic from '../MarkerGraphic/GenMarker';
 
 export function MarkerNode(props) { 
   const { x, y, ID, uuid, selected } = props;
@@ -14,7 +15,7 @@ export function MarkerNode(props) {
         span('.input-point.bool-data', { dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '1.5', offsetY: '69' } }, 'TIMEOUT'),
         span('.input-point.bool-data', { dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '1.5', offsetY: '83.5' } }, 'SOURCE'),
       ]),
-      img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
+      generateArucoMarkerGraphic(ID),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs', [
         span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '242', offsetY: '40' }}, 'DETECT'),
         span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '242', offsetY: '54.5' }}, 'X'),
@@ -53,7 +54,7 @@ export function NumberNode(props) {
     [
       input(
         '.node-input.node-number-input.var-number-input',
-        { dataset: { uuid }, attrs: { type: 'number', min: 0, max: 1000, value } },
+        { dataset: { uuid }, attrs: { type: 'number', min: -1000, max: 1000, value } },
       ),
       div('.node-outputs.center-outputs', [
         span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '72', offsetY: '25' } }, '')

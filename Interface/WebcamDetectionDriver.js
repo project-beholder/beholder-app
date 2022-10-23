@@ -46,7 +46,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
 
     detectFrameTime -= dt;
     if (detectFrameTime <= 0) {
-      detectFrameTime = 50; // Detection FPS HERE
+      detectFrameTime = 30; // Detection FPS HERE
 
       detectThread.stdin.cork();
       detectThread.stdin.write(`001${shouldFlip}\r\n`);
