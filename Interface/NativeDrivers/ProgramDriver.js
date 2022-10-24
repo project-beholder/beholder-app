@@ -43,6 +43,7 @@ let programGraph = {}
 function updateNode(node, input) {
   switch (node.type) {
     case 'key-press':
+      console.log(input);
       // 2 process listers and dispatch key events
       if (input && !node.isDown) {
         pressKey(node.value);

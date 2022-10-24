@@ -5,7 +5,7 @@ export default function createNode(props, uuid) {
       return {
         ...props,
         ID: 0,
-        timeout: 1000 / 50, // DEFAULT_MARKER_TIMEOUT
+        timeout: 100, // DEFAULT_MARKER_TIMEOUT
         uuid,
         output: [],
         selected: false,
