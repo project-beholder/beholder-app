@@ -2,7 +2,7 @@ const { spawn, exec } = require('node:child_process');
 const R = require('ramda');
 const xs = require('xstream').default;
 
-const getKeyCode = require('./Utils/MacKeyMap.js');
+const getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 
 let keyThread;
 
@@ -68,7 +68,7 @@ function updateNode(node, input) {
       // input for a marker node will be the markers
 
       // make sure marker properties match in the detection code
-      input[node.ID] = node.timeout;
+      input[node.ID].timeout = node.timeout;
       // set node properties for rendering
 
       // this could possibly change when displaying data live feed
@@ -76,13 +76,14 @@ function updateNode(node, input) {
         updateNode(programGraph[out.target.parent], input[node.ID][out.field]);
       });
       break;
-    case 'change':
+    case 'value-change':
       // add value to running tab
-      node.totalDelta += input;
+      node.totalDelta += input - node.lastValue;
+      node.lastValue = input;
       let trigger = false;
 
       // if threshold is exceeded, reset to zero and pass true to all children
-      if (node.threshold > 0) {
+      if (node.threshold >= 0) {
         if (node.totalDelta >= node.threshold) {
           trigger = true;
           node.totalDelta = 0;
@@ -90,13 +91,14 @@ function updateNode(node, input) {
         // need to clamp at zero
         node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
       } else {
-        if (node.totalDelta < node.threshold) {
+        if (node.totalDelta <= node.threshold) {
+          trigger = true;
           node.totalDelta = 0;
         }
 
         node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
       }
-
+      console.log(trigger);
       // pass trigger state to all children
       node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
       break;

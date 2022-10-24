@@ -1,6 +1,6 @@
 // const { spawn } = require('node:child_process');
-const Marker = require('./Utils/Marker.js');
-const Vec2 = require('./Utils/Vec2.js');
+const Marker = require('./NativeDrivers/Utils/Marker.js');
+const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
@@ -80,6 +80,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       }
 
       detectThread.stdout.on('data', (rawData) => {
+        // console.log(rawData);
         const data = JSON.parse(rawData);
         if (data.markers) updateMarkers(data.markers);
         

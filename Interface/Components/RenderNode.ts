@@ -30,12 +30,12 @@ export function ChangeNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '1.5', offsetY: '54.5' } }, 'VALUE'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '1.5', offsetY: '69' } }, 'THRESHOLD'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '1.5', offsetY: '18' } }, 'VALUE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '1.5', offsetY: '32.5' } }, 'THRESHOLD'),
       ]),
       span('.logic-node-text','CHANGE'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
-      div('.node-outputs', [
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '242', offsetY: '69' }}, ''),
+      div('.node-outputs.center-outputs', [
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '219', offsetY: '34' }}, ''),
       ])
     ]
   );
@@ -114,7 +114,7 @@ export function NumberNode(props) {
         { dataset: { uuid }, attrs: { type: 'number', min: -1000, max: 1000, value } },
       ),
       div('.node-outputs.center-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '72', offsetY: '25' } }, '')
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '78', offsetY: '25' } }, '')
       ]),
     ]
   )

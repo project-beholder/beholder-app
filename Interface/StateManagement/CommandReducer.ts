@@ -45,7 +45,7 @@ export default function CommandReducer(oldNodes, action) {
         });
 
         if (nodes[end.parent].type === 'number') {
-          nodes[start.parent][start.name] = nodes[end.parent].value;
+          nodes[start.parent][start.name] = parseInt(nodes[end.parent].value);
         }
       }
       UndoRedoManager.pushUndoState(nodes);
@@ -119,7 +119,7 @@ export default function CommandReducer(oldNodes, action) {
       if (nodes[action.uuid].type === 'number') {
         nodes[action.uuid].output.forEach((o) => {
           // console.log(o);
-          nodes[o.target.parent][o.target.name] = action.newValue
+          nodes[o.target.parent][o.target.name] = parseInt(action.newValue);
         });
       }
       break;

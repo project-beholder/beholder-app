@@ -48,9 +48,10 @@ export default function createNode(props, uuid) {
       return {
         ...props,
         uuid,
-        value: 0,
+        value: 1,
         threshold: 1000,
         totalDelta: 0,
+        lastValue: 0, 
         output: [],
         selected: false,
       };

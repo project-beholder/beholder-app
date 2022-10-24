@@ -168,4 +168,10 @@
   left: 0px;
 }
 
+.draggable-node .logic-node-text {
+  font-weight: 300;
+  font-size: 20px;
+  margin: 0 20px;
+}
+
 /* 240 : 480 for  aspect ratio */
