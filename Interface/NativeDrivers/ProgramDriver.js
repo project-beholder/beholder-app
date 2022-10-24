@@ -1,8 +1,12 @@
 const { spawn, exec } = require('node:child_process');
+const process = require('node:process');
 const R = require('ramda');
 const xs = require('xstream').default;
 
-const getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
+
+let getKeyCode;
+if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
+else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 
 let keyThread;
 
@@ -22,7 +26,8 @@ function releaseKey(key) {
 }
 
 function initKeyboard() {
-  keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
+  if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/keyboardEmulation.exe');
+  else keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
       console.log(`stdout keyboard: ${rawData}`);

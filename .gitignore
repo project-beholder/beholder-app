@@ -3,3 +3,4 @@ node_modules
 dist
 bin
 **/**/.DS_Store
+frame.jpg

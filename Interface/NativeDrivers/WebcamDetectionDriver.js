@@ -30,7 +30,9 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   })
 
   // detection thread init
-  const detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
+  let detectThread;
+  if (process.platform === 'win32') detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker.exe');
+  else detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
   detectThread.stdin.setDefaultEncoding('utf-8');
 
   let prevDetectTime = Date.now();
@@ -80,7 +82,8 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       }
 
       detectThread.stdout.on('data', (rawData) => {
-        // console.log(rawData);
+        if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
+
         const data = JSON.parse(rawData);
         if (data.markers) updateMarkers(data.markers);
         
