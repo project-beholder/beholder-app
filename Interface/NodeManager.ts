@@ -6,7 +6,7 @@ import sampleCombine from 'xstream/extra/sampleCombine';
 
 // Local
 import renderNode from './Components/RenderNode';
-import CommandReducer from './CommandReducer';
+import CommandReducer from './StateManagement/CommandReducer';
 
 // TODO: Move this to another file
 function renderConnections(nodes) {

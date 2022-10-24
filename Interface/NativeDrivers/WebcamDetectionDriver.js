@@ -1,5 +1,5 @@
 // const { spawn } = require('node:child_process');
-const Marker = require('./Marker.js');
+const Marker = require('./Utils/Marker.js');
 const Vec2 = require('./Utils/Vec2.js');
 
 const AXIS_VEC = new Vec2(1.0, 0);
@@ -46,7 +46,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
 
     detectFrameTime -= dt;
     if (detectFrameTime <= 0) {
-      detectFrameTime = 30; // Detection FPS HERE
+      detectFrameTime = 1000 / 45; // Detection FPS HERE
 
       detectThread.stdin.cork();
       detectThread.stdin.write(`001${shouldFlip}\r\n`);

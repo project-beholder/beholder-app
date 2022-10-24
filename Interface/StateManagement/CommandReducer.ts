@@ -4,45 +4,8 @@ import * as R from 'ramda';
 
 // Local
 import UndoRedoManager from './UndoRedoManager';
+import createNode from './CreateNode';
 
-function createNode(props, uuid) {
-  // Could replace this with an object that has functions for processing
-  switch(props.type) {
-    case 'marker':
-      return {
-        ...props,
-        ID: 0,
-        uuid,
-        output: [],
-        selected: false,
-      };
-    case 'key':
-      return {
-        ...props,
-        value: 'a',
-        uuid,
-        input: [],
-        selected: false,
-      };
-    case 'number':
-      return {
-        ...props,
-        value: 0,
-        uuid,
-        output: [],
-        selected: false,
-      }
-    case 'detection':
-      return {
-        ...props,
-        camID: 0,
-        uuid,
-        output: [],
-        selected: false,
-      }
-  }
-  return null; // this is an error friend
-}
 
 // This is a giant function :()
 // maybe turn into a map, that just returns based on key. Only local var is "nodes"

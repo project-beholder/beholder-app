@@ -2,7 +2,7 @@ const { spawn, exec } = require('node:child_process');
 const R = require('ramda');
 const xs = require('xstream').default;
 
-const getKeyCode = require('../Native/KeyboardEmulation/MacKeyMap.js');
+const getKeyCode = require('./Utils/MacKeyMap.js');
 
 let keyThread;
 
@@ -42,26 +42,63 @@ function initKeyboard() {
 let programGraph = {}
 function updateNode(node, input) {
   switch (node.type) {
-    case 'key':
+    case 'key-press':
       // 2 process listers and dispatch key events
       if (input && !node.isDown) {
-        // console.log('release!', keyNode.key);
         pressKey(node.value);
         node.isDown = true;
       }
 
       if (!input && node.isDown) {
-        // console.log('release!', keyNode.key);
         releaseKey(node.value);
         node.isDown = false;
       }
       break;
+    case 'key-tap':
+      // tap key once when triggered
+      if (input && !node.isDown) {
+        pressKey(node.value);
+        releaseKey(node.value);
+        node.isDown = true;
+      }
+
+      if (!input && node.isDown) node.isDown = false;
+      break;
     case 'marker':
       // input for a marker node will be the markers
+
+      // make sure marker properties match in the detection code
+      input[node.ID] = node.timeout;
+      // set node properties for rendering
+
       // this could possibly change when displaying data live feed
       node.output.forEach((out) => {
         updateNode(programGraph[out.target.parent], input[node.ID][out.field]);
       });
+      break;
+    case 'change':
+      // add value to running tab
+      node.totalDelta += input;
+      let trigger = false;
+
+      // if threshold is exceeded, reset to zero and pass true to all children
+      if (node.threshold > 0) {
+        if (node.totalDelta >= node.threshold) {
+          trigger = true;
+          node.totalDelta = 0;
+        }
+        // need to clamp at zero
+        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+      } else {
+        if (node.totalDelta < node.threshold) {
+          node.totalDelta = 0;
+        }
+
+        node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
+      }
+
+      // pass trigger state to all children
+      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
       break;
     default: break;
   }

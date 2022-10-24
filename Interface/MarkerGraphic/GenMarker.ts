@@ -29,6 +29,7 @@
 
 import dict from './dict';
 import { svg, h, } from '@cycle/dom';
+import * as R from 'ramda';
 
 function generateMarkerSvg(width: number, height: number, bits) {
 	// var svg = document.createElement('svg');
@@ -71,7 +72,7 @@ function generateMarkerSvg(width: number, height: number, bits) {
   );
 }
 
-export default function generateArucoMarkerGraphic(id) {
+function generateArucoMarkerGraphic(id) {
 	var bytes = dict[id];
 	var bits = [];
 	var bitsCount = 4 * 4;
@@ -87,3 +88,5 @@ export default function generateArucoMarkerGraphic(id) {
 	return generateMarkerSvg(4, 4, bits);
 }
 
+// Memoized so that it doesn't run this every time the marker data updates
+export default R.memoizeWith(Number, generateArucoMarkerGraphic);

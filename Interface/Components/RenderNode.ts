@@ -1,7 +1,45 @@
-import { div, img, span, h2, select, option, input } from '@cycle/dom';
+import { div, img, span, h2, select, option, input, video } from '@cycle/dom';
 
 import { KEY_MAPPINGS } from '../Constants/Keys';
 import generateArucoMarkerGraphic from '../MarkerGraphic/GenMarker';
+
+let cameras = [];
+navigator.mediaDevices.enumerateDevices().then(function (devices) {
+  for(var i = 0; i < devices.length; i ++){
+    cameras = devices.filter(({ kind }) => kind == 'videoinput');
+  };
+});
+
+// navigator.mediaDevices.enumerateDevices().then(function (devices) {
+//   for(var i = 0; i < devices.length; i ++){
+//       var device = devices[i];
+//       if (device.kind === 'videoinput') {
+//           var option = document.createElement('option');
+//           option.value = device.deviceId;
+//           option.text = device.label || 'camera ' + (i + 1);
+//           document.querySelector('select#videoSource').appendChild(option);
+//       }
+//   };
+// });
+
+export function ChangeNode(props) { 
+  const { x, y, uuid, selected } = props;
+
+  return div(
+    '.draggable-node',
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    [
+      div('.node-inputs', [
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '1.5', offsetY: '54.5' } }, 'VALUE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '1.5', offsetY: '69' } }, 'THRESHOLD'),
+      ]),
+      span('.logic-node-text','CHANGE'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
+      div('.node-outputs', [
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '242', offsetY: '69' }}, ''),
+      ])
+    ]
+  );
+};
 
 export function MarkerNode(props) { 
   const { x, y, ID, uuid, selected } = props;
@@ -26,7 +64,7 @@ export function MarkerNode(props) {
   );
 };
 
-export function KeyNode(props) {
+export function KeyPressNode(props) {
   const { x, y, value, uuid, selected } = props;
 
   return div(
@@ -35,6 +73,25 @@ export function KeyNode(props) {
     [
       div('.node-inputs', [
         span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '1.5', offsetY: '22' } }, 'PRESS')
+      ]),
+      select(
+        '.node-input.node-select-input.key-select',
+        { dataset: { uuid } },
+        KEY_MAPPINGS.map((k) => option({ attrs: { value: k.value, selected: (k.value === value)} }, k.text))
+      ),
+    ]
+  )
+}
+
+export function KeyTapNode(props) {
+  const { x, y, value, uuid, selected } = props;
+
+  return div(
+    '.draggable-node.dark-node',
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
+    [
+      div('.node-inputs', [
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '1.5', offsetY: '22' } }, 'TAP')
       ]),
       select(
         '.node-input.node-select-input.key-select',
@@ -77,10 +134,7 @@ export function DetectionPanel(props, frame) {
         select(
           '.detection-select.camera-select',
           { dataset: { uuid: 'detection-panel' } },
-          [
-            option({ attrs: { value: 0 } }, 'Camera 1'),
-            option({ attrs: { value: 1 } }, 'Camera 2')
-          ]
+          cameras.map((c, value) => option({ attrs: { value }}, c.label))
         ),
       ]),
       div('labelded-select', [
@@ -97,9 +151,11 @@ export function DetectionPanel(props, frame) {
 export default function renderNode(node, frame) {
   switch(node.type) {
     case 'marker': return MarkerNode(node);
-    case 'key': return KeyNode(node);
+    case 'key-press': return KeyPressNode(node);
+    case 'key-tap': return KeyTapNode(node);
     case 'number': return NumberNode(node);
     case 'detection': return DetectionPanel(node, frame);
+    case 'value-change': return ChangeNode(node);
     default: return '';
   }
 }

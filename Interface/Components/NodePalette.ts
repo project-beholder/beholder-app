@@ -20,7 +20,13 @@ function view(display$, position$) {
       [
         div('.palette-category', ['VARIABLES', ul([button('.create-button', { dataset: { type: 'number' } }, 'Number')])]),
         div('.palette-category', ['MARKER', ul([button('.create-button', { dataset: { type: 'marker' } }, 'Detect Marker')])]),
-        div('.palette-category', ['KEYS', ul([button('.create-button', { dataset: { type: 'key' } }, 'Press Key')])]),
+        div('.palette-category', ['LOGIC', ul([
+          button('.create-button', { dataset: { type: 'value-change' } }, 'Value Change Trigger'),
+        ])]),
+        div('.palette-category', ['KEYS', ul([
+          button('.create-button', { dataset: { type: 'key-press' } }, 'Press Key'),
+          button('.create-button', { dataset: { type: 'key-tap' } }, 'Tap Key'),
+        ])]),
         div('.palette-category', ['DETECTION', ul([button('.create-button', { dataset: { type: 'detection' } }, 'Webcam Detection')])]),
       ]
     )
@@ -37,10 +43,6 @@ export default function NodePalette(sources: any) {
   const createButtonPress$ = DOM.select('.create-button').events('click')
     .compose(sampleCombine(position$))
     .map(([ev, position]) => ({ command: 'create', props: { type: ev.target.dataset.type, ...position } }));
-
-  // const markerCreate$ = DOM.select('#create-marker').events('click')
-  //   .compose(sampleCombine(position$))
-  //   .map(([_, position]) => ({ command: 'create', props: { type: 'marker', ...position } }));
 
   const starterCreate$ = xs.empty();
   const create$ = xs.merge(

@@ -12,6 +12,6 @@
     "strict": true,
     "target": "es6",
   },
-  "include": ["Interface/**/*", "Native/KeyboardEmulation/MacKeyMap.js"],
+  "include": ["Interface/**/*"],
   "exclude": ["node_modules", "js"],
 }
