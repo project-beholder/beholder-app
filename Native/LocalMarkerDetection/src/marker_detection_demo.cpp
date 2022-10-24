@@ -20,7 +20,7 @@ int main( int argc, char* argv[] )
     inputVideo.open(0);
 
     // Obtain ArUco dictionary and create detector
-    Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_ARUCO_ORIGINAL);
+    Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_4X4_250);
     aruco::ArucoDetector detector(dictionary);
 
     while (inputVideo.grab()) {
@@ -29,6 +29,9 @@ int main( int argc, char* argv[] )
         inputVideo.retrieve(image);
         image.copyTo(imageCopy);
 
+        // Flip image
+        flip(imageCopy, image, 0);
+
         // Detect markers
         vector<int> ids;
         vector<vector<Point2f>> corners, rejected;
@@ -36,10 +39,10 @@ int main( int argc, char* argv[] )
 
         // If marker detected, show
         if (ids.size() > 0)
-            aruco::drawDetectedMarkers(imageCopy, corners, ids);
+            aruco::drawDetectedMarkers(image, corners, ids);
 
         // Show image
-        imshow("out", imageCopy);
+        imshow("out", image);
         char key = (char) waitKey(10);
         if (key == 27)
             break; 
