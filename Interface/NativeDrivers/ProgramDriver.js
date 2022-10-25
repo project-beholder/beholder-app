@@ -1,13 +1,14 @@
 const { spawn, exec } = require('node:child_process');
 const process = require('node:process');
+const path = require('path');
 const R = require('ramda');
 // const Vec2 = require('./Utils/Vec2.js');
 const xs = require('xstream').default;
 
 
 let getKeyCode;
-if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
-else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
+if (process.platform === 'win32') getKeyCode = require('./Interface/NativeDrivers/Utils/WinKeyMap.js');
+else getKeyCode = require('./Interface/NativeDrivers/Utils/MacKeyMap.js');
 
 let keyThread;
 
@@ -28,12 +29,12 @@ function releaseKey(key) {
 
 function initKeyboard() {
   if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation.exe');
-  else keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
+  else keyThread = spawn(path.join(__dirname, './Native/KeyboardEmulation/build/keyboardEmulation'));
   keyThread.stdin.setDefaultEncoding('utf-8');
-  keyThread.stdout.on('data', (rawData) => {
-      console.log(`stdout keyboard: ${rawData}`);
+  // keyThread.stdout.on('data', (rawData) => {
+      // console.log(`stdout keyboard: ${rawData}`);
       // const data = JSON.parse(rawData);
-  });
+  // });
   
   // Make sure to kill the child process on exit or mem leak
   process.on('SIGINT', () => { process.exit(0); });

@@ -1,6 +1,6 @@
 // const { spawn } = require('node:child_process');
-const Marker = require('./NativeDrivers/Utils/Marker.js');
-const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
+const Marker = require('./Interface/NativeDrivers/Utils/Marker.js');
+const Vec2 = require('./Interface/NativeDrivers/Utils/Vec2.js');
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
@@ -18,7 +18,6 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       switch(type) {
         case 'camera-feed':
           detectThread.stdin.cork();
-          // console.log(value)
           detectThread.stdin.write(`10${value}0\r\n`);
           detectThread.stdin.uncork();
           break;
@@ -32,7 +31,8 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   // detection thread init
   let detectThread;
   if (process.platform === 'win32') detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker.exe');
-  else detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
+  else detectThread = spawn(path.join(__dirname, './Native/LocalMarkerDetection/build/detectMarker'));
+  // else detectThread = spawn(path.join(__dirname, '../../Native/LocalMarkerDetection/build/detectMarker')); // for electron build swap in this line
   detectThread.stdin.setDefaultEncoding('utf-8');
 
   let prevDetectTime = Date.now();
@@ -86,11 +86,19 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       detectThread.stdout.on('data', (rawData) => {
         if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
 
-        if (document.querySelector('.detection-img')) document.querySelector('.detection-img').src = `../frame.jpg?${Date.now()}`;
+        if (document.querySelector('.detection-img')) document.querySelector('.detection-img').src = `./frame.jpg?${Date.now()}`;
 
         const data = JSON.parse(rawData);
         if (data.markers) updateMarkers(data.markers);
         
+      });
+
+      detectThread.stderr.on('data', (data) => {
+        console.log(`stderr: ${data}`);
+      });
+      
+      detectThread.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
       });
 
       // start the detection parade
