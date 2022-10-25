@@ -1,8 +1,64 @@
 #node-palette {
   position: absolute;
+  top: 0;
+  left: 0;
   display: none;
+  z-index: 100;
+
+  /* font-family: sans-serif; */
 }
 
 #node-palette.display {
+ display: block;
+}
+
+.palette-category {
+  position: relative;
+  width: 100px;
+  background-color: lightgray;
+  padding: 5px 5px;
+}
+
+.palette-category::after {
+  content: '▸';
+  position: absolute;
+  right: 5px;
+  top: 3px;
+}
+
+.palette-category > ul {
+  display: none;
+  position: absolute;
+  left: 100px;
+  top: 0px;
+  /* width: 100px; */
+}
+
+.palette-category:hover {
+  background-color: black;
+  color: white;
+  border-right: 1px solid lightgray;
+}
+
+.palette-category:hover > ul {
   display: block;
+  background-color: black;
+}
+
+.palette-category button {
+  border: none;
+  padding: 5px;
+  /* background-color: black; */
+  width: 120px;
+  text-align: left;
+  background-color: transparent;
+  color: white;
+  font-size: 12px;
+  border-bottom: 1px solid lightgray;
+  min-width: max-content;
+  cursor: pointer;
+}
+
+.palette-category button:hover {
+  font-weight: 600;
 }

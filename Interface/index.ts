@@ -13,19 +13,41 @@ function main(sources: any) {
   const { DOM } = sources;
 
   // only do this for global events
-  const documentKeyDown$ = fromEvent(document, 'keydown');
-  const spacebar$ = documentKeyDown$.filter((ev) => ev.key === ' ');
-  const esc$ = documentKeyDown$.filter((ev) => ev.key === 'Escape');
+  const globalKeyDown$ = fromEvent(document, 'keydown');
+  const spacebar$ = globalKeyDown$.filter((ev) => ev.key === ' ');
+  const esc$ = globalKeyDown$.filter((ev) => ev.key === 'Escape');
+  const rightClick$ = fromEvent(document, 'contextmenu').map((ev) => { ev.preventDefault(); return ev; });
 
-  const mousePos$ = DOM.events('mousemove').map((ev: MouseEvent) => ({ x: ev.clientX, y: ev.clientY }));
+  const mousePos$ = DOM.events('mousemove')
+    .fold((pos, ev: MouseEvent) => ({
+      x: ev.clientX,
+      y: ev.clientY,
+      dx: ev.clientX - pos.x,
+      dy: ev.clientY - pos.y,
+      oldDx: ev.movementX,
+      oldDy: ev.movementY,
+    }), { x: 0, y: 0, dx: 0, dy: 0 });
+  
+  // .map((ev: MouseEvent) => ({ x: ev.clientX, y: ev.clientY, dx: ev.movementX, dy: ev.movementY }));
 
   const mouseUp$ = xs.merge(DOM.events('mouseup'), DOM.events('mouseleave'));
-  
-  const paletteProp$ = xs.merge(spacebar$.mapTo({ display: true }), esc$.mapTo({ display: false }))
-    .startWith({ display: false });
+  const globalMouseDown$ = fromEvent(document, 'mousedown');
+
+  const paletteHideProxy$ = xs.create();
+
+  const palettePos$ = rightClick$.map((ev: MouseEvent) => ({ x: ev.clientX, y: ev.clientY }))
+  const paletteDisplay$ = xs.merge(esc$.mapTo(false), globalMouseDown$.mapTo(false), rightClick$.mapTo(true), paletteHideProxy$.mapTo(false));
+  const paletteProp$ = xs.combine(paletteDisplay$, palettePos$)
+    .map(([ display, position ]) => ({ display, position }))
+    .startWith({ display: false, position: { x: 0, y: 0 } });
 
   const palette = NodePalette({ DOM: sources.DOM, props$: paletteProp$ });
-  const nodeManager = NodeManager({ DOM: sources.DOM, mouseUp$, mousePos$, create$: palette.create$ });
+  const nodeManager = NodeManager({ ...sources, mouseUp$, globalMouseDown$, globalKeyDown$, mousePos$, create$: palette.create$ });
+
+  paletteHideProxy$.imitate(xs.merge(
+    nodeManager.capturedClicks$,
+    palette.create$
+  ));
 
   const vdom$ = xs.combine(palette.DOM, nodeManager.DOM)
     .map(([creator, manager]) =>
@@ -35,32 +57,21 @@ function main(sources: any) {
       ])
     );
 
+  // Peak at the detection driver
+  sources.WebcamDetection.subscribe({
+    next: (m) => { return; },
+  });
+
+  const feedChange$ = DOM.select('.camera-select').events('change').map((ev) => ({ type: 'camera-feed', value: ev.target.value }));
+  const flipCamera$ = DOM.select('.camera-flip').events('change').map((ev) => ({ type: 'flip', value: ev.target.checked ? 1 : 0 }));
+
   return {
-    DOM: vdom$
+    DOM: vdom$,
+    WebcamDetection: xs.merge(feedChange$, flipCamera$),
+    ProgramManager: nodeManager.nodes$,
   };
 }
 
-// TODO
-// Switch to map datastructure for graph https://www.youtube.com/watch?v=hRSwSAr-gok
-// can load a mapping
-// switch node creator to overlay
-// place nodes near previous
-// node preview
-// remove nodes
-// remove connections
-// add background dots
-// select item
-// select multiple items
-// delete items
-// does this mean lines need ids :( ?
-// logic nodes
-// need some error handling on text input for invalid input
-// Change node point classes to be: ".io-point.output" or ".io-point.input"
+// console.log(makeWebcamDetectionDriver);
 
-// rendering of that node should be done through a pure function
-// - node types: MARKER, OPERATION, KEY .... LOGIC :(
-// idk how to do undo/redo
-// EACH NODE SHOULD HAVE AN OUTGOING STATE STREAM
-// ALL ARE COMBINED WHEN...
-
-run(main, { DOM: makeDOMDriver('#main-app') });
+run(main, { DOM: makeDOMDriver('#main-app'),  WebcamDetection: WebcamDetectionDriver, ProgramManager: ProgramDriver });

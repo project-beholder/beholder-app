@@ -1,13 +1,54 @@
-// This file is for testing the c++ keyboard emulator is working as intended
+const { spawn, ChildProcess } = require('node:child_process');
+const path = require('path');
 
-const keyEmulator = require('./build/Release/keyboard_emulator');
+const getKeyCode = require('./MacKeyMap.js');
 
-// keyEmulator.init();a
-setTimeout(() => keyEmulator.press(0x41), 5000);
-setTimeout(() => keyEmulator.release(0x41), 10000);
 
-// setTimeout(() => keyEmulator.press(0x42), 10000);
-// // setTimeout(() => keyEmulator.release(0x42), 5600);
 
-// setTimeout(() => keyEmulator.press(0x43), 6000);
-// // setTimeout(() => keyEmulator.release(0x43), 6100);
+let keyThread;
+// Marker stuff
+let prevTime = Date.now();
+
+function loop() {
+  keyThread.stdin.cork();
+  keyThread.stdin.write('000\r\n');
+  keyThread.stdin.uncork();
+}
+
+function pressKey(key) {
+  const hex = getKeyCode(key);
+  keyThread.stdin.cork();
+  keyThread.stdin.write(`P:${hex}\r\n`);
+  keyThread.stdin.uncork();
+}
+
+function releaseKey(key) {
+  const hex = getKeyCode(key);
+  keyThread.stdin.cork();
+  keyThread.stdin.write(`R:${hex}\r\n`);
+  keyThread.stdin.uncork();
+}
+
+
+function init() {
+  keyThread = spawn(path.join(__dirname, './build/keyboardEmulation'));
+  keyThread.stdin.setDefaultEncoding('utf-8');
+  keyThread.stdout.on('data', (rawData) => {
+      console.log(`stdout: ${rawData}`);
+      // const data = JSON.parse(rawData);
+  });
+  
+  // Make sure to kill the child process on exit or mem leak
+  process.on('SIGINT', () => { process.exit(0); });
+  process.on('SIGTERM', () => { process.exit(0); });
+  process.on('exit', () => {
+      console.log('Killing child process');
+      keyThread.kill();
+  });
+  
+  pressKey('↑');
+}
+
+init();
+
+module.exports = { init };

@@ -1,4 +1,4 @@
-const Vec2 = require('./Utils/Vec2.js');
+const Vec2 = require('./Vec2.js');
 
 const MARKER_TIMEOUT_DEFAULT = 1000 / 20; 
 const AXIS_VEC = new Vec2(1, 0);
@@ -37,7 +37,7 @@ class Marker {
   }
 
   update(m) {
-    const [id, x, y, rotation] = m;
+    const { id, x, y, rotation } = m;
     this.timestamp = 0;
     this.present = true;
 

@@ -1,47 +1,63 @@
-
-/* MarkerNode */
-.marker-node {
-  position: absolute;
+/* Base node css */
+.draggable-node {
   top: 0;
   left: 0;
-  height: 130px;
-  width: 130px;
+  position: absolute;
   transform: translate(0, 0);
-  /* transition: transform ease-in-out 30ms; */
   z-index: 10;
-
-  padding: 25px 25px 25px 25px;
-  border: 1px solid #000000;
+  padding: 10px 10px;
+  border: 1px solid lightgray;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
-  background-color: #ffffff;
+  background-color: white;
+  color: black;
 }
 
-.marker-node img {
-  width: 80px;
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-  user-drag: none;
+.dark-node {
+  background-color: black;
+  color: white;
 }
 
-.node-outputs {
-  position: absolute;
-  top: 5%;
-  right: -90px;
-  height: 90%;
-  padding: 0 15px;
-  width: 90px;
-  border: 1px dashed black;
-  border-left: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  z-index: 9;
-  border-radius: 0 5px 5px 0;
-  font-family: monospace;
+.draggable-node span {
+  /* font-family: sans-serif; */
   font-size: 12px;
+  min-height: 6px;
+}
+
+.node-select-input {
+  width: 60px;
+  text-align: left;
+  margin-left: 15px;
+}
+
+.selected::before {
+  position: absolute;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  content: '';
+  background-color: transparent;
+  border: 3px solid palevioletred;
+  border-radius: 5px;
+  top: -7px;
+  left: -7px;
+  z-index: -1;
+}
+
+/* Node Output styles */
+.node-outputs {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-weight: 600;
+  /* font-family: monospace; */
+  font-size: 12px;
+  vertical-align: bottom;
+}
+
+.center-outputs {
+  justify-content: center;
+  min-height: 20px;
+  min-width: 1px;
 }
 
 .output-point {
@@ -52,123 +68,110 @@
   user-select: none;
 }
 
-.output-point.number-data:after {
-  width: 11px;
-  height: 11px;
+.output-point:after {
   content: '';
-  background-color: black;
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  top: 1.5px;
+  right: -15px;
+  background-color: white;
+  border: 2px solid black;
   border-radius: 20px;
-  right: -22px;
-  top: 2px;
-  display: block;
-  position: absolute;
-  border: 1px solid white;
 }
 
-.output-point.number-data:hover:after { border: 1px solid black; }
-
-.output-point.bool-data:after {
-  content: '';
-  width: 0px;
-  height: 0px;
-  position: absolute;
-  top: 1px;
-  right: -24px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-left: 13px solid black;
+.output-point:hover:after {
+  background-color: black;
 }
 
-.output-point.bool-data:hover:before {
-  content: '';
-  width: 0;
-  height: 0;
-  position: absolute;
-  top: 0px;
-  right: -26px;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left: 16px solid black;
-}
 
-/* KeyNod */
-.key-node {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 80px;
-  width: 80px;
-  text-align: center;
-  background-color: #ffffff;
-  transform: translate(0, 0);
-  /* transition: transform ease-in-out 30ms; */
-  z-index: 10;
-
-  padding: 20px;
-  border: 1px solid #000000;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 5px;
-}
-
-.key-node h2 {
-  font-family: sans-serif;
-  font-size: 40px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
+/* Node Input styles */
 .node-inputs {
-  position: absolute;
-  top: 5%;
-  left: -70px;
-  height: 90%;
-  padding: 0 18px;
-  width: 70px;
-  border: 1px dashed black;
-  border-right: none;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  z-index: 9;
-  border-radius: 5px 0 0 5px;
-  font-family: monospace;
+  justify-content: flex-end;
+  /* font-family: monospace; */
   font-size: 12px;
+  vertical-align: bottom;
 }
 
 .input-point {
-  z-index: 20;
-  text-align: left;
   position: relative;
-  cursor: pointer;
   user-select: none;
 }
 
-.input-point.bool-data:after {
+.input-point:after {
   content: '';
-  width: 0px;
-  height: 0px;
+  width: 7px;
+  height: 7px;
   position: absolute;
-  top: 4px;
-  left: -21px;
-  border-top: 4px solid transparent;
-  border-bottom: 4px solid transparent;
-  border-left: 8px solid white;
-}
-.input-point.bool-data:hover:after {
-  border-left: 8px solid black;
+  top: 1.5px;
+  left: -15px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 20px;
 }
 
-
-.input-point.bool-data:before {
-  content: '';
-  width: 0;
-  height: 0;
-  position: absolute;
-  top: -1px;
-  left: -24px;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  border-left: 16px solid black;
+.input-point:hover:after {
+  /* border-left: 8px solid black; */
 }
+
+/* MarkerNode */
+.marker-node-img {
+  width: 80px;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  margin: 0 20px;
+  vertical-align: bottom;
+}
+
+/* Variable nodes */
+.node-number-input {
+  text-align: right;
+  /* padding-right: 5px; */
+}
+
+/* detection panel */
+.detection-panel {
+  width: 322px;
+}
+
+.detection-panel .output-point {
+  position: absolute;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.labeled-select {
+  margin-top: 200px;
+}
+.select-label {
+  margin-right: 5px;
+}
+
+.detection-view {
+  width: 100%;
+  background: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 3px 3px 0 0;
+}
+
+.detection-img {
+  position: absolute;
+  top: 14px;
+  left: 0px;
+}
+
+.draggable-node .logic-node-text {
+  font-weight: 300;
+  font-size: 20px;
+  margin: 0 20px;
+}
+
+/* 240 : 480 for  aspect ratio */

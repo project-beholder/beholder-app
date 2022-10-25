@@ -10,6 +10,9 @@ html {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
 }
 
 body {
@@ -46,56 +49,33 @@ body {
 */
 
 /* COMPONENTS */
-/* NodeCreator */
-#node-creator {
-  position: absolute;
-  z-index: 100;
-}
 
-#node-creator input {
-  text-align: center;
-  width: 150px;
-  height: 40px;
-  font-size: 18px;
-  background: none;
-  border: none;
-  /* box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); */
-
-  box-shadow: 0px 2px 6px rgb(0 0 0 / 40%);
-
-  padding: 6px;
-  border-radius: 8px;
-  border-bottom: 3px solid black;
-}
-
-#node-creator input:focus, #node-creator input:focus-visible {
-  border: none;
-  border-radius: 8px;
-  border-bottom: 3px solid black;
-  outline: none;
-}
 
 /* svg line stuff */
 #connection-lines {
   width: 100vw;
   height: 100vh;
-  /* position: absolut; */
+  position: relative;
+  z-index: 900;
+  pointer-events: none;
 }
 
 .connection-path {
-  stroke:#aaa;
-  stroke-width:2;
-  stroke-dasharray: 5;
-  animation: dash .5s linear infinite;
-  animation-iteration-count: infinite;
+  stroke:#000;
+  stroke-width: 5px;
+  /* stroke-width:2;
+  stroke-dasharray: 5; */
+  /* animation: dash .5s linear infinite;
+  animation-iteration-count: infinite; */
   transition: color .1s ease-in-out;
+  
 }
 
-@keyframes dash {
+/* @keyframes dash {
   to {
     stroke-dashoffset: -10;
   }
-}
+} */
 
 .connection-path:hover {
   /* stroke-width: 4; */
@@ -104,17 +84,19 @@ body {
 
 .preview-path {
   stroke:transparent;
-  stroke-width: 2;
   pointer-events: none;
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
   user-drag: none;
+  position: relative;
+  z-index: 900;
 }
 
 .visible {
-  stroke:#aaaaaa;
+  stroke:#000;
+  stroke-width: 5px;
 }
 
 .send-to-server {

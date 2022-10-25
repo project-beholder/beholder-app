@@ -1,66 +1,75 @@
 // Lib
 import xs from 'xstream';
-import { div, svg, h, button } from '@cycle/dom';
-import { v4 as uuidv4 } from 'uuid';
+import { div, svg, h, button, select } from '@cycle/dom';
 import * as R from 'ramda';
+import sampleCombine from 'xstream/extra/sampleCombine';
 
 // Local
 import renderNode from './Components/RenderNode';
-import sampleCombine from 'xstream/extra/sampleCombine';
-import UndoRedoManager from './UndoRedoManager';
+import CommandReducer from './StateManagement/CommandReducer';
 
-function distanceSq(x1: number, y1: number, x2: number, y2: number): number {
-  return (x1 - x2) * (x1 - x2) + (y1 - y2) + (y1 - y2);
-}
-
-function createNode(props, uuid) {
-  // Could replace this with an object that has functions for processing
-  switch(props.type) {
-    case 'marker':
-      return {
-        ...props,
-        uuid,
-        output: [],
-      };
-    case 'key':
-      return {
-        ...props,
-        uuid,
-        input: [],
-      };
-  }
-  return null; // this is an error friend
-}
-
+// TODO: Move this to another file
 function renderConnections(nodes) {
   const lines = Object.values(nodes)
     .filter(R.has('output'))
     .map((n) => {
       return n.output // to render I don't need them sorted
         .map((o) => {
-          return h('line.connection-path',
+          const x1 = n.x + o.offsetX;
+          const y1 = n.y + o.offsetY;
+          const x2 = nodes[o.target.parent].x + o.target.offsetX;
+          const y2 = nodes[o.target.parent].y + o.target.offsetY;
+          const curveX = x1 + 30; // x1 + (x2 - x1)/6;
+          const midX = x1 + (x2 - x1)/2;
+          const midY = y1 + (y2 - y1)/2;
+
+          // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
+          // lets make a curve!
+          return h('path.connection-path',
             {
               attrs: {
-                x1: n.x + o.offsetX,
-                y1: n.y + o.offsetY,
-                x2: nodes[o.target.parent].x + o.target.offsetX,
-                y2: nodes[o.target.parent].y + o.target.offsetY,
+                'stroke-linecap': 'round',
+                d: `M ${x1} ${y1} Q ${curveX} ${y1}, ${midX} ${midY} T ${x2} ${y2}`,
+                fill: 'transparent',
               }
-            })
+            });
         });
     });
   return R.flatten(lines);
 }
-// const previewLine$ = xs.of(h('path.preview-path.visible', { attrs: { d: "M 175 200 q 175 200 150 0" } }));
-// const previewLine$ = xs.of(h('path.preview-path.visible', { attrs: { d: "M 0 0 q 150 100 200 200" } }));
-// d="M708.6181124121713,384.29071257403524 C923.9757228727523,384.29071257403524 923.9757228727523,223.5 1139.3333333333333,223.5"
-// const previewLine$ = xs.of(h('line.preview-path.visible', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }));
-// d="M828.3678124503721,438.92600222891923 C1014.6839062251861,438.92600222891923 1014.6839062251861,225 1201,225"
 
 function NodeManager(sources: any) {
-  const { DOM, mouseUp$, create$, mousePos$ } = sources;
+  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
 
-  const holdNode$ = DOM.select('.draggable-node').events('mousedown')
+  const nodeMouseDown$ = DOM.select('.draggable-node').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev;
+    });
+  const nodeMouseUp$ = DOM.select('.draggable-node').events('mouseup')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev;
+    });
+
+
+  // get a proxy of all the nodes
+  // if more than 1 selected: mouse up sends single select events and mouse down only sends on multiselect
+  
+  // ok so things are weird, I need a list of currently selected elements so I need a proxy for it
+  const selectedProxy$ = xs.create();
+  const clearSelectProxy$ = xs.empty();
+  const singleSelectUUID$ = xs.merge(
+    nodeMouseDown$.map((ev) => [ev.currentTarget?.dataset.uuid, ev.shiftKey, 'down']),
+    nodeMouseUp$.map((ev) => [ev.currentTarget?.dataset.uuid, ev.shiftKey, 'up']),
+    clearSelectProxy$.mapTo(['', false, 'down']),
+    xs.of(['', false, 'down']) // effectively 'start with'
+  );
+
+  const selectCommand$ = singleSelectUUID$.map(([uuid, multiselect, mButton]) => ({ command: 'select', uuid, multiselect, mButton }));
+  const deleteCommand$ = globalKeyDown$.filter((ev) => ev.key === 'Backspace').mapTo({ command: 'delete' });
+
+  const holdNode$ = nodeMouseDown$
     .map((ev: MouseEvent) => {
       const rect = ev.currentTarget.getBoundingClientRect();
       const offsetX = ev.clientX - rect.left;
@@ -73,139 +82,84 @@ function NodeManager(sources: any) {
     });
 
   // UNDO REDO SETUP
-  const cmdZPress$ = DOM.select('document').events('keydown')
+  const cmdZPress$ = globalKeyDown$
     .filter((e) => {
       return (e.key == 'z' && e.metaKey)
     });
   const undo$ = cmdZPress$.filter((e) => (!e.shiftKey)).mapTo({ command: 'undo' });
   const redo$ = cmdZPress$.filter((e) => (e.shiftKey)).mapTo({ command: 'redo' });
 
-  const draggableDown$ = DOM.select('.draggable-node').events('mousedown');
-  const draggableUp$ = DOM.select('.draggable-node').events('mouseup')
   const isHeld$ = xs.merge(
-    draggableDown$.mapTo(true),
-    draggableUp$.mapTo(false),
+    nodeMouseDown$.mapTo(true),
+    nodeMouseUp$.mapTo(false),
     mouseUp$.mapTo(false),
   );
 
   const move$ = xs.combine(mousePos$, holdNode$, isHeld$)
     .filter(R.nth(2))
-    .map(([pos, held]) => ({ command: 'move', props: { ...held, ...pos } }));
+    .map(([pos, held]) => ({ command: 'move', ...pos }));
   
   const connectProxy$ = xs.create();
 
-  // hack for movement undo
-  const moveEnd$ = xs.combine(mousePos$, isHeld$)
-    .fold((acc, [pos, isHolding]) => {
-      
-      return acc;
-    }, { prevPos: { x: 0, y: 0 }, dist: 0, wasHolding: false, isHolding: false})
-    .filter(({ dist, wasHolding, isHolding }) => (dist > 200 && wasHolding && !isHolding))
-    .mapTo({ command: 'move-end'}).debug();
+  // Individual node events here
+  // is there a way to make this more generic? probably in dataset
+  const nodeValueChange$ = DOM.select('.node-input')
+    .events('change')
+    .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: e.target.value }));
 
   // generate node objects from all of the elements
   // move this to a function + file
-  const nodes$ = xs.merge(create$, move$, connectProxy$, undo$, redo$, moveEnd$)
-    .fold((oldNodes, action) => {
-
-      let nodes = R.clone(oldNodes);
-      switch(action.command) {
-        case 'create':
-          const uuid = uuidv4();
-          nodes[uuid] = createNode(action.props, uuid);
-          globalSendToServer(nodes);
-          UndoRedoManager.pushUndoState(nodes);
-          break;
-        case 'move':
-          nodes[action.props.uuid].x = action.props.x - action.props.offsetX;
-          nodes[action.props.uuid].y = action.props.y - action.props.offsetY;
-          break;
-        case 'connect':
-          const { start, end } = action.props;
-          if (start.type === 'output' && end.type == 'input') {
-            nodes[start.parent].output.push({
-              offsetX: parseFloat(start.offsetX),
-              offsetY: parseFloat(start.offsetY),
-              field: start.name,
-              target: { 
-                ...end,
-                offsetX: parseFloat(end.offsetX),
-                offsetY: parseFloat(end.offsetY),
-              },
-            });
-          } else if (end.type === 'output' && start.type == 'input') {
-            nodes[end.parent].output.push({
-              offsetX: parseFloat(end.offsetX),
-              offsetY: parseFloat(end.offsetY),
-              field: end.name,
-              target: {
-                ...start,
-                offsetX: parseFloat(start.offsetX),
-                offsetY: parseFloat(start.offsetY),
-              },
-            });
-          }
-          globalSendToServer(nodes);
-          UndoRedoManager.pushUndoState(nodes);
-          // only connected 1 way atm, let's see if it works (output -> input)
-          // also should validate if this is any good
-          break;
-        case 'move-end':
-          UndoRedoManager.pushUndoState(nodes);
-          break;
-        case 'undo':
-          if (UndoRedoManager.canUndo()) {
-            nodes = UndoRedoManager.undo();
-            globalSendToServer(nodes);
-          }
-          break;
-        case 'redo':
-          if (UndoRedoManager.canRedo()) {
-            nodes = UndoRedoManager.redo();
-            globalSendToServer(nodes);
-          }
-          break;
-      }
-      return nodes;
-    }, {}).remember();
-  
-  const outputPressed$ = xs.merge(
-      DOM.select('.output-point').events('mousedown'),
-      DOM.select('.input-point').events('mousedown'),
+  const nodes$ = xs.merge(
+      create$,
+      move$,
+      connectProxy$,
+      undo$,
+      redo$,
+      deleteCommand$,
+      selectCommand$,
+      nodeValueChange$, // replace when more of this command type come in to play, ie number
     )
+    .fold(CommandReducer, {}).remember();
+  
+  const outputPressed$ = DOM.select('.output-point').events('mousedown')
     .map((ev: MouseEvent) => {
       ev.stopPropagation();
       return ev.target.dataset;
     });
-  const createLineDropped$ = xs.merge(
-      DOM.select('.input-point').events('mouseup'),
-      DOM.select('.output-point').events('mouseup')
-    )
-    .map((ev: MouseEvent) => ev.target.dataset);
+  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
 
-  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), outputPressed$.mapTo(true));
+  // needs to hide on mouse up and when a connection is made, but show when an output is clicked
+  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true));
   const previewLine$ = xs.combine(outputPressed$, mousePos$, nodes$, showPreviewLine$)
       .map(([data, mouse, nodes, show]) => {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
         const heldNode = nodes[data.parent];
 
-        if (heldNode) {
-          return h('line.preview-path',
-            {
-              class: { visible: show },
-              attrs: {
-                x1: heldNode.x + offsetX, y1: heldNode.y + offsetY,
-                x2: mouse.x, y2: mouse.y
-              }
-            });
-        }
-        return h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } })
-      }).startWith(h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }))
-      // .mapTo(h('path.preview-path.visible', {
-      //   attrs: { d: "M100,250 C100,100 400,100 400,250" } 
-      // }));
+        const x1 = heldNode.x + offsetX;
+        const y1 = heldNode.y + offsetY;
+        const x2 = mouse.x;
+        const y2 = mouse.y;
+        const midX = x1 + (x2 - x1)/2;
+        const midY = y1 + (y2 - y1)/2;
+        const curveX = Math.abs(x2 - x1) > 5 ? x1 + 30 : x1;//x1 + (x2 - x1)/6;
 
+        // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
+        // lets make a curve!
+        return h('path.preview-path',
+          {
+            class: { visible: show },
+            attrs: {
+              'stroke-linecap': 'round',
+              d: `M ${x1} ${y1} Q ${curveX} ${y1}, ${midX} ${midY} T ${x2} ${y2}`,
+              fill: 'transparent',
+            },
+          });
+      }).startWith(h('line.preview-path', { attrs: { x1: 0, y1: 0, x2: 200, y2: 200 } }));
+
+  // selection code part 2
+  const clearSelect$ = xs.merge(globalMouseDown$, deleteCommand$)
+  clearSelectProxy$.imitate(clearSelect$);
   
   // this needs to be proxied and turned into a node update
   // lines should be rendered directly from nodes
@@ -215,19 +169,24 @@ function NodeManager(sources: any) {
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   
   const vdom$ = xs.combine(nodes$, previewLine$)
-    .map(([nodes, previewLine]) => {
+    .map(([nodes, previewLine, frame]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
+
       // do svg lines here from nodes data
       return div([
-        ...Object.values(nodes).map(renderNode), // render nodes
+        ...Object.values(nodes).map((n) => renderNode(n)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });
 
+  // need this because I am stopping propoggation
+  const capturedClicks$ = xs.merge(nodeMouseDown$, outputPressed$);
 
   const sinks = {
     DOM: vdom$,
+    capturedClicks$,
+    nodes$,
   }
   return sinks;
 }

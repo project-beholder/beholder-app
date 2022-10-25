@@ -8,6 +8,7 @@ function createWindow() {
       // preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
+      backgroundThrottling: false,
     },
     height: 900,
     width: 1600,
@@ -42,6 +43,3 @@ app.on("window-all-closed", () => {
     app.quit();
   // }
 });
-
-// run udp server
-// require('./UDPManager.js');
