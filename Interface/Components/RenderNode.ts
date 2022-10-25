@@ -26,7 +26,7 @@ export function ChangeNode(props) {
   const { x, y, uuid, selected } = props;
 
   return div(
-    '.draggable-node',
+    `#${uuid}.draggable-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
@@ -45,7 +45,7 @@ export function AngleChangeNode(props) {
   const { x, y, uuid, selected } = props;
 
   return div(
-    '.draggable-node',
+    `#${uuid}.draggable-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
@@ -65,7 +65,7 @@ export function MarkerNode(props, marker) {
   const { posX, posY, rotation, present } = marker;
 
   return div(
-    '.draggable-node',
+    `#${uuid}.draggable-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
@@ -88,7 +88,7 @@ export function KeyPressNode(props) {
   const { x, y, value, uuid, selected } = props;
 
   return div(
-    '.draggable-node.dark-node',
+    `#${uuid}.draggable-node.dark-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
@@ -107,7 +107,7 @@ export function KeyTapNode(props) {
   const { x, y, value, uuid, selected } = props;
 
   return div(
-    '.draggable-node.dark-node',
+    `#${uuid}.draggable-node.dark-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
@@ -126,7 +126,7 @@ export function NumberNode(props) {
   const { x, y, uuid, selected, value } = props;
 
   return div(
-    '.draggable-node.simple-node',
+    `#${uuid}.draggable-node.simple-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       input(

@@ -72,6 +72,4 @@ function main(sources: any) {
   };
 }
 
-// console.log(makeWebcamDetectionDriver);
-
 run(main, { DOM: makeDOMDriver('#main-app'),  WebcamDetection: WebcamDetectionDriver, ProgramManager: ProgramDriver });
