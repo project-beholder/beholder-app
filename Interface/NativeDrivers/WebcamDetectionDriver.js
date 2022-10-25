@@ -60,6 +60,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   const detectedProducer = {
     start: function(listener) {
       let prevMarkerTime = Date.now();
+
       const updateMarkers = (detectedMarkers) => {
         const currTime = Date.now();
         const dt = currTime - prevMarkerTime;

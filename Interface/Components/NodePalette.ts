@@ -55,7 +55,7 @@ export default function NodePalette(sources: any) {
     .events('mousedown')
     .subscribe({
       next: (ev) => ev.stopPropagation(),
-    })
+    });
 
   const sinks = {
     DOM: view(display$, position$),

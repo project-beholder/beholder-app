@@ -168,14 +168,14 @@ function NodeManager(sources: any) {
       .map(([start, end]) => ({ command: 'connect', props: { start, end } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   
-  const vdom$ = xs.combine(nodes$, previewLine$)
-    .map(([nodes, previewLine, frame]) => {
+  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)
+    .map(([nodes, previewLine, markerData]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
 
       // do svg lines here from nodes data
       return div([
-        ...Object.values(nodes).map((n) => renderNode(n)), // render nodes
+        ...Object.values(nodes).map((n) => renderNode(n, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });

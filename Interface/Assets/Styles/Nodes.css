@@ -261,4 +261,10 @@
   margin-top: 4px;
 }
 
+.marker-data {
+  min-width: 35px;
+  text-align: right;
+  display: inline-block;
+}
+
 /* 240 : 480 for  aspect ratio */

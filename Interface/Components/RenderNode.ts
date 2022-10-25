@@ -41,8 +41,9 @@ export function ChangeNode(props) {
   );
 };
 
-export function MarkerNode(props) { 
+export function MarkerNode(props, marker) { 
   const { x, y, ID, uuid, selected } = props;
+  const { posX, posY, rotation, present } = marker;
 
   return div(
     '.draggable-node',
@@ -55,10 +56,10 @@ export function MarkerNode(props) {
       ]),
       generateArucoMarkerGraphic(ID),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs', [
-        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '245', offsetY: '38' }}, 'DETECT'),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '245', offsetY: '55' }}, 'X'),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '245', offsetY: '72' }}, 'Y'),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '245', offsetY: '89' }}, 'ANGLE'),
+        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '245', offsetY: '38' }}, ['DETECT', span('.marker-data', present.toString())]),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '245', offsetY: '55' }}, ['X', span('.marker-data', posX)]),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '245', offsetY: '72' }}, ['Y', span('.marker-data', posY)]),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '245', offsetY: '89' }}, ['ANGLE', span('.marker-data', rotation)]),
       ])
     ]
   );
@@ -148,9 +149,9 @@ export function DetectionPanel(props) {
   );
 }
 
-export default function renderNode(node) {
+export default function renderNode(node, markerData) {
   switch(node.type) {
-    case 'marker': return MarkerNode(node);
+    case 'marker': return MarkerNode(node, markerData[node.ID]);
     case 'key-press': return KeyPressNode(node);
     case 'key-tap': return KeyTapNode(node);
     case 'number': return NumberNode(node);

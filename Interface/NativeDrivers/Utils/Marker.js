@@ -50,8 +50,8 @@ class Marker {
     this.position.copy(this.center);
     this.rawPosition.x = x;
     this.rawPosition.x = y;
-    this.posX = this.center.x;
-    this.posY = this.center.y;
+    this.posX = Math.round(this.center.x);
+    this.posY = Math.round(this.center.y);
 
     this.deltaPosition.sub(this.position).scale(-1); // bc we changed center this should be cool now
 
@@ -72,7 +72,7 @@ class Marker {
       (prevRotationVec.x * (this.rotationSmoothing)) + (newRotationVec.x * 1 - this.rotationSmoothing),
       (prevRotationVec.y * (this.rotationSmoothing)) + (newRotationVec.y * 1 - this.rotationSmoothing)
     );
-    this.rotation = smoothedRotationVec.getAngle();
+    this.rotation = Math.round(smoothedRotationVec.getAngle() * 180 / Math.PI);
 
     this.deltaRotation = Vec2.angleBetween(prevRotationVec, smoothedRotationVec);
 
