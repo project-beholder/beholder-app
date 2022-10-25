@@ -1,27 +1,63 @@
 /* Base node css */
+:root {
+  --gray-mid: #777777;
+  --gray-dark: #222222;
+  --gray-light: #F0F0F0;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 200;
+  src: url(fonts/Inter-Light.ttf);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url(fonts/Inter-Regular.ttf);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  src: url(fonts/Inter-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  src: url(fonts/Inter-ExtraBold.ttf);
+}
+
 .draggable-node {
   top: 0;
   left: 0;
   position: absolute;
   transform: translate(0, 0);
   z-index: 10;
-  padding: 10px 10px;
-  border: 1px solid lightgray;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  padding: 15px 10px;
+  border: 1px solid var(--gray-mid);
+  box-shadow: -3px 3px 4px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
   background-color: white;
+  font-family: 'Inter', sans-serif;
   color: black;
 }
 
 .dark-node {
-  background-color: black;
+  background-color: var(--gray-dark);
   color: white;
 }
 
 .draggable-node span {
   /* font-family: sans-serif; */
   font-size: 12px;
-  min-height: 6px;
+  padding: 3px 0 0 0;
+  min-height: 10px;
 }
 
 .node-select-input {
@@ -32,18 +68,19 @@
 
 .selected::before {
   position: absolute;
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
   content: '';
   background-color: transparent;
   border: 3px solid palevioletred;
-  border-radius: 5px;
-  top: -7px;
-  left: -7px;
+  border-radius: 10px;
+  top: -9px;
+  left: -9px;
   z-index: -1;
 }
 
 /* Node Output styles */
+
 .node-outputs {
   display: inline-flex;
   flex-direction: column;
@@ -55,8 +92,13 @@
 }
 
 .center-outputs {
+  width: 1px;
+  display: inline-flex;
   justify-content: center;
+  align-items: center;
+  align-content: center;
   min-height: 20px;
+  height: 100%;
   min-width: 1px;
 }
 
@@ -66,18 +108,24 @@
   position: relative;
   cursor: pointer;
   user-select: none;
+  font-weight: 600;
 }
 
 .output-point:after {
   content: '';
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   position: absolute;
-  top: 1.5px;
-  right: -15px;
+  top: 4px;
+  right: -17px;
   background-color: white;
   border: 2px solid black;
   border-radius: 20px;
+}
+
+.center-outputs .output-point:after {
+  top: -4px;
+  right: -17px;
 }
 
 .output-point:hover:after {
@@ -87,6 +135,7 @@
 
 /* Node Input styles */
 .node-inputs {
+  z-index: 20;
   display: inline-flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -98,22 +147,29 @@
 .input-point {
   position: relative;
   user-select: none;
+  font-weight: 600;
 }
 
 .input-point:after {
   content: '';
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   position: absolute;
-  top: 1.5px;
-  left: -15px;
+  top: 4px;
+  left: -17px;
   background-color: white;
   border: 2px solid black;
   border-radius: 20px;
+  transition: all 100ms ease-in-out;
 }
 
 .input-point:hover:after {
-  /* border-left: 8px solid black; */
+  width: 10px;
+  height: 10px;
+  top: 2px;
+  left: -19px;
+  border: 3px solid black;
+  cursor: pointer;
 }
 
 /* MarkerNode */
@@ -132,6 +188,15 @@
 .node-number-input {
   text-align: right;
   /* padding-right: 5px; */
+  width: 75px;
+  height: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  background: none;
+  border: none;
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-mid);
+  border-radius: 3px;
 }
 
 /* detection panel */
@@ -142,6 +207,7 @@
 .detection-panel .output-point {
   position: absolute;
   right: 10px;
+  bottom: 15px;
   font-size: 12px;
   font-weight: 600;
 }
@@ -150,7 +216,17 @@
   margin-top: 200px;
 }
 .select-label {
-  margin-right: 5px;
+  position: relative;
+  float: left;
+  width: 60px;
+  text-transform: uppercase;
+}
+
+.detection-parameter {
+  position: relative;
+  float: left;
+  clear: both;
+  min-height: 30px;
 }
 
 .detection-view {
@@ -166,12 +242,23 @@
   position: absolute;
   top: 14px;
   left: 0px;
+  user-select: none;
+  pointer-events: none;
 }
 
 .draggable-node .logic-node-text {
   font-weight: 300;
   font-size: 20px;
   margin: 0 20px;
+}
+
+.detection-select {
+  background: var(--gray-light);
+  margin-top: 2px;
+}
+
+.detection-check {
+  margin-top: 4px;
 }
 
 /* 240 : 480 for  aspect ratio */

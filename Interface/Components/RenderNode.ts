@@ -49,16 +49,16 @@ export function MarkerNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '1.5', offsetY: '54.5' } }, 'ID'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '1.5', offsetY: '69' } }, 'TIMEOUT'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '1.5', offsetY: '83.5' } }, 'SOURCE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '0.5', offsetY: '55' } }, 'ID'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '0.5', offsetY: '72' } }, 'TIMEOUT'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '0.5', offsetY: '89' } }, 'SOURCE'),
       ]),
       generateArucoMarkerGraphic(ID),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs', [
-        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '242', offsetY: '40' }}, 'DETECT'),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '242', offsetY: '54.5' }}, 'X'),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '242', offsetY: '69' }}, 'Y'),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '242', offsetY: '83.5' }}, 'ANGLE'),
+        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '245', offsetY: '38' }}, 'DETECT'),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '245', offsetY: '55' }}, 'X'),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '245', offsetY: '72' }}, 'Y'),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '245', offsetY: '89' }}, 'ANGLE'),
       ])
     ]
   );
@@ -106,7 +106,7 @@ export function NumberNode(props) {
   const { x, y, uuid, selected, value } = props;
 
   return div(
-    '.draggable-node',
+    '.draggable-node.simple-node',
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       input(
@@ -114,7 +114,7 @@ export function NumberNode(props) {
         { dataset: { uuid }, attrs: { type: 'number', min: -1000, max: 1000, value } },
       ),
       div('.node-outputs.center-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '78', offsetY: '25' } }, '')
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '98', offsetY: '33' } }, '')
       ]),
     ]
   )
@@ -129,7 +129,7 @@ export function DetectionPanel(props) {
     [
       div('.detection-view', 'hide-me peter'), // position this absolute, kthanks
       img('.detection-img', { attrs: { src: '../frame.jpg' } }),
-      div('.labeled-select', [
+      div('.labeled-select.detection-parameter', [
         span('.select-label', 'CAMERA'),
         select(
           '.detection-select.camera-select',
@@ -137,7 +137,7 @@ export function DetectionPanel(props) {
           cameras.map((c, value) => option({ attrs: { value }}, c.label))
         ),
       ]),
-      div('labelded-select', [
+      div('.detection-parameter', [
         span('.select-label', 'flip'),
         input('.detection-check.camera-flip', { attrs: { type: 'checkbox' }})
       ]),
