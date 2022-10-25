@@ -47,6 +47,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
     prevDetectTime = currTime;
 
     detectFrameTime -= dt;
+
     if (detectFrameTime <= 0) {
       detectFrameTime = 1000 / 45; // Detection FPS HERE
 
@@ -83,6 +84,8 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
 
       detectThread.stdout.on('data', (rawData) => {
         if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
+
+        if (document.querySelector('.detection-img')) document.querySelector('.detection-img').src = `../frame.jpg?${Date.now()}`;
 
         const data = JSON.parse(rawData);
         if (data.markers) updateMarkers(data.markers);

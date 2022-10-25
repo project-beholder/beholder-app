@@ -122,13 +122,13 @@ export function NumberNode(props) {
 
 // this should only be updated every couple of frames probs, not every update
 // document.querySelector('#test-img').src = "../frame.png?" + new Date().getTime();
-export function DetectionPanel(props, frame) {
+export function DetectionPanel(props) {
   const { uuid, selected, x, y } = props;
   return div('.draggable-node.detection-panel',
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.detection-view', 'hide-me peter'), // position this absolute, kthanks
-      img('.detection-img', { attrs: { src: frame } }),
+      img('.detection-img', { attrs: { src: '../frame.jpg' } }),
       div('.labeled-select', [
         span('.select-label', 'CAMERA'),
         select(
@@ -148,13 +148,13 @@ export function DetectionPanel(props, frame) {
   );
 }
 
-export default function renderNode(node, frame) {
+export default function renderNode(node) {
   switch(node.type) {
     case 'marker': return MarkerNode(node);
     case 'key-press': return KeyPressNode(node);
     case 'key-tap': return KeyTapNode(node);
     case 'number': return NumberNode(node);
-    case 'detection': return DetectionPanel(node, frame);
+    case 'detection': return DetectionPanel(node);
     case 'value-change': return ChangeNode(node);
     default: return '';
   }
