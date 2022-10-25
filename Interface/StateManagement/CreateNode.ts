@@ -44,6 +44,7 @@ export default function createNode(props, uuid) {
         output: [],
         selected: false,
       };
+    case 'angle-change':
     case 'value-change':
       return {
         ...props,

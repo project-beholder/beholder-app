@@ -41,6 +41,25 @@ export function ChangeNode(props) {
   );
 };
 
+export function AngleChangeNode(props) { 
+  const { x, y, uuid, selected } = props;
+
+  return div(
+    '.draggable-node',
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    [
+      div('.node-inputs', [
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '1.5', offsetY: '18' } }, 'ANGLE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '1.5', offsetY: '32.5' } }, 'THRESHOLD'),
+      ]),
+      span('.logic-node-text','CHANGE'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
+      div('.node-outputs.center-outputs', [
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '219', offsetY: '34' }}, ''),
+      ])
+    ]
+  );
+};
+
 export function MarkerNode(props, marker) { 
   const { x, y, ID, uuid, selected } = props;
   const { posX, posY, rotation, present } = marker;
@@ -157,6 +176,7 @@ export default function renderNode(node, markerData) {
     case 'number': return NumberNode(node);
     case 'detection': return DetectionPanel(node);
     case 'value-change': return ChangeNode(node);
+    case 'angle-change': return AngleChangeNode(node);
     default: return '';
   }
 }

@@ -1,6 +1,7 @@
 const { spawn, exec } = require('node:child_process');
 const process = require('node:process');
 const R = require('ramda');
+// const Vec2 = require('./Utils/Vec2.js');
 const xs = require('xstream').default;
 
 
@@ -46,6 +47,7 @@ function initKeyboard() {
 
 let programGraph = {}
 function updateNode(node, input) {
+  let trigger = false;
   switch (node.type) {
     case 'key-press':
       console.log(input);
@@ -86,7 +88,6 @@ function updateNode(node, input) {
       // add value to running tab
       node.totalDelta += input - node.lastValue;
       node.lastValue = input;
-      let trigger = false;
 
       // if threshold is exceeded, reset to zero and pass true to all children
       if (node.threshold >= 0) {
@@ -104,9 +105,37 @@ function updateNode(node, input) {
 
         node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
       }
-      console.log(trigger);
+
       // pass trigger state to all children
       node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      break;
+    case 'angle-change':
+      // add value to running tab
+      const currentRotVec = Vec2.fromAngle(input / 180 * Math.PI);
+      const prevRotVec = Vec2.fromAngle(node.lastValue / 180 * Math.PI);
+      node.totalDelta += prevRotVec.angleBetween(currentRotVec) / Math.PI * 180;
+      node.lastValue = input;
+
+      // if threshold is exceeded, reset to zero and pass true to all children
+      if (node.threshold >= 0) {
+        if (node.totalDelta >= node.threshold) {
+          trigger = true;
+          node.totalDelta = 0;
+        }
+        // need to clamp at zero
+        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+      } else {
+        if (node.totalDelta <= node.threshold) {
+          trigger = true;
+          node.totalDelta = 0;
+        }
+
+        node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
+      }
+
+      // pass trigger state to all children
+      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      break;
       break;
     default: break;
   }
