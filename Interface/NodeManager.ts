@@ -105,6 +105,23 @@ function NodeManager(sources: any) {
     .map(([pos, held]) => ({ command: 'move', ...pos }));
   
   const connectProxy$ = xs.create();
+  const outputPressed$ = DOM.select('.output-point').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev.target.dataset;
+    });
+  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
+  const connectedInputPressed$ = DOM.select('.input-point.connected').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev.target.dataset;
+    });
+
+  const removeConnection$ = connectedInputPressed$.map((data) => ({
+    command: 'remove-connection',
+    uuid: data.parent,
+    name: data.name,
+  }));
 
   // Individual node events here
   // is there a way to make this more generic? probably in dataset
@@ -122,16 +139,10 @@ function NodeManager(sources: any) {
       redo$,
       deleteCommand$,
       selectCommand$,
-      nodeValueChange$, // replace when more of this command type come in to play, ie number
+      nodeValueChange$,
+      removeConnection$, // replace when more of this command type come in to play, ie number
     )
     .fold(CommandReducer, {}).remember();
-  
-  const outputPressed$ = DOM.select('.output-point').events('mousedown')
-    .map((ev: MouseEvent) => {
-      ev.stopPropagation();
-      return ev.target.dataset;
-    });
-  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
 
   // needs to hide on mouse up and when a connection is made, but show when an output is clicked
   const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true));

@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { div, img, span, h2, select, option, input, video } from '@cycle/dom';
 
 import { KEY_MAPPINGS } from '../Constants/Keys';
@@ -10,28 +11,28 @@ navigator.mediaDevices.enumerateDevices().then(function (devices) {
   };
 });
 
-// navigator.mediaDevices.enumerateDevices().then(function (devices) {
-//   for(var i = 0; i < devices.length; i ++){
-//       var device = devices[i];
-//       if (device.kind === 'videoinput') {
-//           var option = document.createElement('option');
-//           option.value = device.deviceId;
-//           option.text = device.label || 'camera ' + (i + 1);
-//           document.querySelector('select#videoSource').appendChild(option);
-//       }
-//   };
-// });
-
 export function ChangeNode(props) { 
-  const { x, y, uuid, selected } = props;
+  const { x, y, uuid, selected, input } = props;
 
   return div(
     `#${uuid}.draggable-node.logic-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' } }, 'VALUE'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' } }, 'THRESHOLD'),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.value)  },
+            dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' }
+          },
+          'VALUE'
+        ),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.threshold)  },
+            dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' }
+          },
+          'THRESHOLD'
+        ),
       ]),
       span('.logic-node-text','Change'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs.center-outputs', [
@@ -42,15 +43,27 @@ export function ChangeNode(props) {
 };
 
 export function AngleChangeNode(props) { 
-  const { x, y, uuid, selected } = props;
+  const { x, y, uuid, selected, input } = props;
 
   return div(
     `#${uuid}.draggable-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' } }, 'ANGLE'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' } }, 'THRESHOLD'),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.value)  },
+            dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' },
+          },
+          'ANGLE'
+        ),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.threshold)  },
+            dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' },
+          },
+          'THRESHOLD'
+        ),
       ]),
       span('.logic-node-text','CHANGE'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs.center-outputs', [
@@ -61,7 +74,7 @@ export function AngleChangeNode(props) {
 };
 
 export function MarkerNode(props, marker) { 
-  const { x, y, ID, uuid, selected } = props;
+  const { x, y, ID, uuid, selected, input } = props;
   const { posX, posY, rotation, present } = marker;
 
   return div(
@@ -69,9 +82,27 @@ export function MarkerNode(props, marker) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '0', offsetY: '59' } }, 'ID'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '0', offsetY: '79' } }, 'TIMEOUT'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '0', offsetY: '99' } }, 'SOURCE'),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.ID)  },
+            dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '0', offsetY: '59' },
+          },
+          'ID'
+        ),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.timeout)  },
+            dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '0', offsetY: '79' },
+          },
+          'TIMEOUT'
+        ),
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.source)  },
+            dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '0', offsetY: '99' },
+          },
+          'SOURCE'
+        ),
       ]),
       generateArucoMarkerGraphic(ID),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs', [
@@ -84,15 +115,22 @@ export function MarkerNode(props, marker) {
   );
 };
 
+// Input Only
 export function KeyPressNode(props) {
-  const { x, y, value, uuid, selected } = props;
+  const { x, y, value, uuid, selected, input } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' } }, 'PRESS')
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.main)  },
+            dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' },
+          },
+          'PRESS'
+        ),
       ]),
       select(
         '.node-input.node-select-input.key-select',
@@ -104,14 +142,20 @@ export function KeyPressNode(props) {
 }
 
 export function KeyTapNode(props) {
-  const { x, y, value, uuid, selected } = props;
+  const { x, y, value, uuid, selected, input } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' } }, 'TAP')
+        span('.input-point.bool-data',
+          {
+            class: { connected: !R.isNil(input.main)  },
+            dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' },
+          },
+          'TAP'
+        ),
       ]),
       select(
         '.node-input.node-select-input.key-select',
@@ -122,6 +166,7 @@ export function KeyTapNode(props) {
   )
 }
 
+// Output Only
 export function NumberNode(props) {
   const { x, y, uuid, selected, value } = props;
 

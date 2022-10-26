@@ -32,6 +32,7 @@ export default function CommandReducer(oldNodes, action) {
       });
       break;
     case 'connect':
+      // START = input, END = output and i have no idea why, maybe fix
       const { start, end } = action.props;
       if (end.type === 'output' && start.type == 'input') {
         nodes[end.parent].output.push({
@@ -45,6 +46,8 @@ export default function CommandReducer(oldNodes, action) {
           },
         });
 
+        nodes[start.parent].input[start.name] = end.parent;
+
         if (nodes[end.parent].type === 'number') {
           nodes[start.parent][start.name] = parseInt(nodes[end.parent].value);
         }
@@ -52,6 +55,15 @@ export default function CommandReducer(oldNodes, action) {
       UndoRedoManager.pushUndoState(nodes);
       // only connected 1 way atm, let's see if it works (output -> input)
       // also should validate if this is any good
+      break;
+    case 'remove-connection':
+      console.log(action);
+      let outNode = nodes[nodes[action.uuid].input[action.name]];
+      // filter out matching output
+      outNode.output = outNode.output.filter(({ target }) => !(target.parent === action.uuid && target.name === action.name));
+      // clear input reference
+      nodes[action.uuid].input[action.name] = null;
+
       break;
     case 'select':
       const selectCount = R.values(nodes).filter(R.prop('selected')).length;

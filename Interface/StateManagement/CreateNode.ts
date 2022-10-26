@@ -8,24 +8,25 @@ export default function createNode(props, uuid) {
         timeout: 100, // DEFAULT_MARKER_TIMEOUT
         uuid,
         output: [],
+        input: { ID: null, timeout: null, source: null },
         selected: false,
       };
     case 'key-press':
       return {
         ...props,
+        input: { main: null },
         value: 'a',
         isDown: false,
         uuid,
-        input: [],
         selected: false,
       };
     case 'key-tap':
       return {
         ...props,
+        input: { main: null },
         value: 'a',
         isDown: false,
         uuid,
-        input: [],
         selected: false,
       };
     case 'number':
@@ -54,6 +55,7 @@ export default function createNode(props, uuid) {
         totalDelta: 0,
         lastValue: 0, 
         output: [],
+        input: { threshold: null, value: null },
         selected: false,
       };
   }
