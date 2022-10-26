@@ -89,4 +89,4 @@ function generateArucoMarkerGraphic(id) {
 }
 
 // Memoized so that it doesn't run this every time the marker data updates
-export default R.memoizeWith(Number, generateArucoMarkerGraphic);
+export default generateArucoMarkerGraphic; //R.memoizeWith(Number, generateArucoMarkerGraphic);

@@ -14,7 +14,6 @@ let keyThread;
 
 function pressKey(key) {
   const hex = getKeyCode(key);
-  console.log(hex);
   keyThread.stdin.cork();
   keyThread.stdin.write(`P:${hex}\r\n`);
   keyThread.stdin.uncork();
@@ -32,6 +31,7 @@ function initKeyboard() {
   else keyThread = spawn(path.join(__dirname, './Native/KeyboardEmulation/build/keyboardEmulation'));
   keyThread.stdin.setDefaultEncoding('utf-8');
   // keyThread.stdout.on('data', (rawData) => {
+
       // console.log(`stdout keyboard: ${rawData}`);
       // const data = JSON.parse(rawData);
   // });
@@ -51,7 +51,6 @@ function updateNode(node, input) {
   let trigger = false;
   switch (node.type) {
     case 'key-press':
-      console.log(input);
       // 2 process listers and dispatch key events
       if (input && !node.isDown) {
         pressKey(node.value);
@@ -155,7 +154,7 @@ function runProgram(markerData) {
 
 function ProgramDriver(programGraph$) {
   initKeyboard();
-  console.log(keyThread);
+  // console.log(keyThread);
   programGraph$.subscribe({
     next: (p) => {
       // console.log('program set', p)

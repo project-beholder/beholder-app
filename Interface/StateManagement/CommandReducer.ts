@@ -10,7 +10,8 @@ import createNode from './CreateNode';
 // This is a giant function :()
 // maybe turn into a map, that just returns based on key. Only local var is "nodes"
 export default function CommandReducer(oldNodes, action) {
-  let nodes = R.clone(oldNodes);
+  // let nodes = R.clone(oldNodes);
+  let nodes = oldNodes;
 
   switch(action.command) {
     case 'create':
@@ -113,12 +114,11 @@ export default function CommandReducer(oldNodes, action) {
       break;
     case 'value-change':
       nodes[action.uuid][action.prop] = action.newValue;
-      UndoRedoManager.pushUndoState(nodes);
+      // UndoRedoManager.pushUndoState(nodes);
 
       // if it's a variable input, send that to all child values
       if (nodes[action.uuid].type === 'number') {
         nodes[action.uuid].output.forEach((o) => {
-          // console.log(o);
           nodes[o.target.parent][o.target.name] = parseInt(action.newValue);
         });
       }
