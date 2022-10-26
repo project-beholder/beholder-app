@@ -22,7 +22,6 @@ export default function CommandReducer(oldNodes, action) {
       const uuid = uuidv4();
       nodes[uuid] = createNode(action.props, uuid);
       UndoRedoManager.pushUndoState(nodes);
-      console.log(nodes);
       break;
     case 'move':
       R.values(nodes).forEach((n) => {
@@ -35,7 +34,6 @@ export default function CommandReducer(oldNodes, action) {
     case 'connect':
       const { start, end } = action.props;
       if (end.type === 'output' && start.type == 'input') {
-        console.log(nodes);
         nodes[end.parent].output.push({
           offsetX: parseFloat(end.offsetX),
           offsetY: parseFloat(end.offsetY),
@@ -117,13 +115,10 @@ export default function CommandReducer(oldNodes, action) {
     case 'value-change':
       nodes[action.uuid][action.prop] = action.newValue;
       // UndoRedoManager.pushUndoState(nodes);
-      console.log(nodes);
 
       // if it's a variable input, send that to all child values
       if (nodes[action.uuid].type === 'number') {
         nodes[action.uuid].output.forEach((o) => {
-          // console.log(o);
-          console.log(o.target.parent);
           nodes[o.target.parent][o.target.name] = parseInt(action.newValue);
         });
       }
