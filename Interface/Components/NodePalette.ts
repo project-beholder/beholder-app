@@ -22,6 +22,7 @@ function view(display$, position$) {
         div('.palette-category', ['MARKER', ul([button('.create-button', { dataset: { type: 'marker' } }, 'Detect Marker')])]),
         div('.palette-category', ['LOGIC', ul([
           button('.create-button', { dataset: { type: 'value-change' } }, 'Value Change Trigger'),
+          button('.create-button', { dataset: { type: 'angle-change' } }, 'Angle Change Trigger'),
         ])]),
         div('.palette-category', ['KEYS', ul([
           button('.create-button', { dataset: { type: 'key-press' } }, 'Press Key'),
@@ -55,7 +56,7 @@ export default function NodePalette(sources: any) {
     .events('mousedown')
     .subscribe({
       next: (ev) => ev.stopPropagation(),
-    })
+    });
 
   const sinks = {
     DOM: view(display$, position$),

@@ -1,6 +1,7 @@
 const { spawn, exec } = require('node:child_process');
 const process = require('node:process');
 const R = require('ramda');
+// const Vec2 = require('./Utils/Vec2.js');
 const xs = require('xstream').default;
 
 
@@ -12,7 +13,6 @@ let keyThread;
 
 function pressKey(key) {
   const hex = getKeyCode(key);
-  console.log(hex);
   keyThread.stdin.cork();
   keyThread.stdin.write(`P:${hex}\r\n`);
   keyThread.stdin.uncork();
@@ -26,11 +26,11 @@ function releaseKey(key) {
 }
 
 function initKeyboard() {
-  if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/keyboardEmulation.exe');
+  if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation.exe');
   else keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
-      console.log(`stdout keyboard: ${rawData}`);
+      // console.log(`stdout keyboard: ${rawData}`);
       // const data = JSON.parse(rawData);
   });
   
@@ -46,9 +46,9 @@ function initKeyboard() {
 
 let programGraph = {}
 function updateNode(node, input) {
+  let trigger = false;
   switch (node.type) {
     case 'key-press':
-      console.log(input);
       // 2 process listers and dispatch key events
       if (input && !node.isDown) {
         pressKey(node.value);
@@ -86,7 +86,6 @@ function updateNode(node, input) {
       // add value to running tab
       node.totalDelta += input - node.lastValue;
       node.lastValue = input;
-      let trigger = false;
 
       // if threshold is exceeded, reset to zero and pass true to all children
       if (node.threshold >= 0) {
@@ -104,9 +103,37 @@ function updateNode(node, input) {
 
         node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
       }
-      console.log(trigger);
+
       // pass trigger state to all children
       node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      break;
+    case 'angle-change':
+      // add value to running tab
+      const currentRotVec = Vec2.fromAngle(input / 180 * Math.PI);
+      const prevRotVec = Vec2.fromAngle(node.lastValue / 180 * Math.PI);
+      node.totalDelta += prevRotVec.angleBetween(currentRotVec) / Math.PI * 180;
+      node.lastValue = input;
+
+      // if threshold is exceeded, reset to zero and pass true to all children
+      if (node.threshold >= 0) {
+        if (node.totalDelta >= node.threshold) {
+          trigger = true;
+          node.totalDelta = 0;
+        }
+        // need to clamp at zero
+        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+      } else {
+        if (node.totalDelta <= node.threshold) {
+          trigger = true;
+          node.totalDelta = 0;
+        }
+
+        node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
+      }
+
+      // pass trigger state to all children
+      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      break;
       break;
     default: break;
   }
@@ -125,7 +152,7 @@ function runProgram(markerData) {
 
 function ProgramDriver(programGraph$) {
   initKeyboard();
-  console.log(keyThread);
+  // console.log(keyThread);
   programGraph$.subscribe({
     next: (p) => {
       // console.log('program set', p)

@@ -19,9 +19,14 @@ function renderConnections(nodes) {
           const y1 = n.y + o.offsetY;
           const x2 = nodes[o.target.parent].x + o.target.offsetX;
           const y2 = nodes[o.target.parent].y + o.target.offsetY;
-          const curveX = x1 + 30; // x1 + (x2 - x1)/6;
-          const midX = x1 + (x2 - x1)/2;
-          const midY = y1 + (y2 - y1)/2;
+          // const curveX = x1 + 30; // x1 + (x2 - x1)/6;
+
+          const cp = Math.max(Math.abs((x2 - x1) / 2), 50);
+
+          const midX1 = x1 + cp;
+          const midX2 = x2 - cp;
+
+          // const midY = y1 + (y2 - y1)/2;
 
           // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
           // lets make a curve!
@@ -29,7 +34,7 @@ function renderConnections(nodes) {
             {
               attrs: {
                 'stroke-linecap': 'round',
-                d: `M ${x1} ${y1} Q ${curveX} ${y1}, ${midX} ${midY} T ${x2} ${y2}`,
+                d: `M ${x1} ${y1} C ${midX1} ${y1}, ${midX2} ${y2}, ${x2} ${y2}`,
                 fill: 'transparent',
               }
             });
@@ -140,9 +145,14 @@ function NodeManager(sources: any) {
         const y1 = heldNode.y + offsetY;
         const x2 = mouse.x;
         const y2 = mouse.y;
-        const midX = x1 + (x2 - x1)/2;
-        const midY = y1 + (y2 - y1)/2;
-        const curveX = Math.abs(x2 - x1) > 5 ? x1 + 30 : x1;//x1 + (x2 - x1)/6;
+        
+        const cp = Math.max(Math.abs((x1 - x2)/2), 50);
+        
+        const midX1 = x1 + cp;
+        const midX2 = x2 - cp;
+
+        // const midY = y2 - (y2 - y1)/2;
+        // const curveX = Math.abs(x2 - x1) > 5 ? x1 + 30 : x1;//x1 + (x2 - x1)/6;
 
         // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
         // lets make a curve!
@@ -151,7 +161,7 @@ function NodeManager(sources: any) {
             class: { visible: show },
             attrs: {
               'stroke-linecap': 'round',
-              d: `M ${x1} ${y1} Q ${curveX} ${y1}, ${midX} ${midY} T ${x2} ${y2}`,
+              d: `M ${x1} ${y1} C ${midX1} ${y1}, ${midX2} ${y2}, ${x2} ${y2}`,
               fill: 'transparent',
             },
           });
@@ -168,14 +178,14 @@ function NodeManager(sources: any) {
       .map(([start, end]) => ({ command: 'connect', props: { start, end } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   
-  const vdom$ = xs.combine(nodes$, previewLine$)
-    .map(([nodes, previewLine, frame]) => {
+  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)
+    .map(([nodes, previewLine, markerData]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
 
       // do svg lines here from nodes data
       return div([
-        ...Object.values(nodes).map((n) => renderNode(n)), // render nodes
+        ...Object.values(nodes).map((n) => renderNode(n, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });
