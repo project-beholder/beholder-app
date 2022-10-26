@@ -30,12 +30,12 @@ export function ChangeNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '30' } }, 'VALUE'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '50' } }, 'THRESHOLD'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' } }, 'VALUE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' } }, 'THRESHOLD'),
       ]),
       span('.logic-node-text','Change'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs.center-outputs', [
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '220', offsetY: '50' }}, ''),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '220', offsetY: '49' }}, ''),
       ])
     ]
   );
@@ -49,12 +49,12 @@ export function AngleChangeNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '1.5', offsetY: '18' } }, 'ANGLE'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '1.5', offsetY: '32.5' } }, 'THRESHOLD'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' } }, 'ANGLE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' } }, 'THRESHOLD'),
       ]),
       span('.logic-node-text','CHANGE'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs.center-outputs', [
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '219', offsetY: '34' }}, ''),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '220', offsetY: '49' }}, ''),
       ])
     ]
   );
@@ -69,16 +69,16 @@ export function MarkerNode(props, marker) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '0', offsetY: '60' } }, 'ID'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '0', offsetY: '80' } }, 'TIMEOUT'),
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '0', offsetY: '100' } }, 'SOURCE'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '0', offsetY: '59' } }, 'ID'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '0', offsetY: '79' } }, 'TIMEOUT'),
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '0', offsetY: '99' } }, 'SOURCE'),
       ]),
       generateArucoMarkerGraphic(ID),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
       div('.node-outputs', [
-        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '280', offsetY: '40' }}, ['DETECT', span('.marker-data', present.toString())]),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '280', offsetY: '60' }}, ['X', span('.marker-data', posX)]),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '280', offsetY: '80' }}, ['Y', span('.marker-data', posY)]),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '280', offsetY: '100' }}, ['ANGLE', span('.marker-data', rotation)]),
+        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '280', offsetY: '39' }}, ['DETECT', span('.marker-data', present.toString())]),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '280', offsetY: '59' }}, ['X', span('.marker-data', posX)]),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '280', offsetY: '79' }}, ['Y', span('.marker-data', posY)]),
+        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '280', offsetY: '99' }}, ['ANGLE', span('.marker-data', rotation)]),
       ])
     ]
   );
@@ -92,7 +92,7 @@ export function KeyPressNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '40' } }, 'PRESS')
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' } }, 'PRESS')
       ]),
       select(
         '.node-input.node-select-input.key-select',
@@ -111,7 +111,7 @@ export function KeyTapNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
       div('.node-inputs', [
-        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '40' } }, 'TAP')
+        span('.input-point.bool-data', { dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' } }, 'TAP')
       ]),
       select(
         '.node-input.node-select-input.key-select',
@@ -134,7 +134,7 @@ export function NumberNode(props) {
         { dataset: { uuid }, attrs: { type: 'number', min: -1000, max: 1000, value } },
       ),
       div('.node-outputs.center-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '120', offsetY: '40' } }, '')
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '120', offsetY: '39' } }, '')
       ]),
     ]
   )
@@ -162,7 +162,7 @@ export function DetectionPanel(props) {
         input('.detection-check.camera-flip', { attrs: { type: 'checkbox' }})
       ]),
       div('.node-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '350', offsetY: '300' } }, 'FEED')
+        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '350', offsetY: '299' } }, 'FEED')
       ]),
     ]
   );
