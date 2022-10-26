@@ -255,19 +255,20 @@ span.select-label {
 }
 
 .detection-view {
-  width: var(--detection-node-w);
+  width: calc(var(--detection-node-w) - 1px);
   background: black;
   position: absolute;
-  top: 0;
-  left: 0;
+  top: -1px;
+  left: -1px;
+  height: 15px;
   border-radius: 3px 3px 0 0;
 }
 
 .detection-img {
   position: absolute;
-  width: var(--detection-node-w);
+  width: calc(var(--detection-node-w) - 1px);
   top: 14px;
-  left: 0px;
+  left: -1px;
   user-select: none;
   pointer-events: none;
 }
