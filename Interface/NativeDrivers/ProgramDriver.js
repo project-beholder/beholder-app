@@ -28,7 +28,7 @@ function releaseKey(key) {
 
 function initKeyboard() {
   if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation.exe');
-  else keyThread = spawn(path.join(__dirname, './Native/KeyboardEmulation/build/keyboardEmulation'));
+  else keyThread = spawn(path.join(__dirname, '../../Native/KeyboardEmulation/build/keyboardEmulation'));
   keyThread.stdin.setDefaultEncoding('utf-8');
   // keyThread.stdout.on('data', (rawData) => {
 

@@ -9,7 +9,7 @@
     "start": "electron ./main.js",
     "rebuild": "electron-rebuild",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "package": "electron-builder"
   },
   "author": "",
   "license": "ISC",
