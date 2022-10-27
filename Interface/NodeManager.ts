@@ -8,25 +8,24 @@ import sampleCombine from 'xstream/extra/sampleCombine';
 import renderNode from './Components/RenderNode';
 import CommandReducer from './StateManagement/CommandReducer';
 
-// TODO: Move this to another file
+
 function renderConnections(nodes) {
   const lines = Object.values(nodes)
-    .filter(R.has('output'))
+    .filter(R.has('outputs'))
     .map((n) => {
-      return n.output // to render I don't need them sorted
-        .map((o) => {
+      return R.flatten(R.values(n.outputs) // to render I don't need them sorted
+        .map((o) => o.targets.map((t) => {
+          // console.log(o, t);
           const x1 = n.x + o.offsetX;
           const y1 = n.y + o.offsetY;
-          const x2 = nodes[o.target.parent].x + o.target.offsetX;
-          const y2 = nodes[o.target.parent].y + o.target.offsetY;
+          const x2 = nodes[t.uuid].x + nodes[t.uuid].inputs[t.field].offsetX;
+          const y2 = nodes[t.uuid].y + nodes[t.uuid].inputs[t.field].offsetY;
           // const curveX = x1 + 30; // x1 + (x2 - x1)/6;
 
           const cp = Math.max(Math.abs((x2 - x1) / 2), 50);
 
           const midX1 = x1 + cp;
           const midX2 = x2 - cp;
-
-          // const midY = y1 + (y2 - y1)/2;
 
           // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
           // lets make a curve!
@@ -38,8 +37,9 @@ function renderConnections(nodes) {
                 fill: 'transparent',
               }
             });
-        });
+        })));
     });
+    // console.log(lines);
   return R.flatten(lines);
 }
 
@@ -152,6 +152,8 @@ function NodeManager(sources: any) {
         const offsetY = parseFloat(data.offsetY);
         const heldNode = nodes[data.parent];
 
+        if (R.isNil(heldNode)) return '';
+
         const x1 = heldNode.x + offsetX;
         const y1 = heldNode.y + offsetY;
         const x2 = mouse.x;
@@ -186,7 +188,7 @@ function NodeManager(sources: any) {
   // lines should be rendered directly from nodes
   const createConnection$ = createLineDropped$.compose(sampleCombine(outputPressed$, showPreviewLine$))
       .filter(R.nth(2))
-      .map(([start, end]) => ({ command: 'connect', props: { start, end } }))
+      .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   
   const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)

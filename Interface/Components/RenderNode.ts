@@ -12,126 +12,70 @@ navigator.mediaDevices.enumerateDevices().then(function (devices) {
 });
 
 export function ChangeNode(props) { 
-  const { x, y, uuid, selected, input } = props;
+  const { x, y, uuid, selected, inputs, outputs } = props;
 
   return div(
     `#${uuid}.draggable-node.logic-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
-      div('.node-inputs', [
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.value)  },
-            dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' }
-          },
-          'VALUE'
-        ),
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.threshold)  },
-            dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' }
-          },
-          'THRESHOLD'
-        ),
-      ]),
-      span('.logic-node-text','Change'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
-      div('.node-outputs.center-outputs', [
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '220', offsetY: '49' }}, ''),
-      ])
+      div('.node-inputs', R.toPairs(inputs).map(
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+      )),
+      span('.logic-node-text','Change'),
+      div('.node-outputs.center-outputs', R.toPairs(outputs).map(
+        ([key, { offsetX, offsetY }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
+      ))
     ]
   );
 };
 
 export function AngleChangeNode(props) { 
-  const { x, y, uuid, selected, input } = props;
+  const { x, y, uuid, selected, inputs, outputs } = props;
 
   return div(
-    `#${uuid}.draggable-node`,
+    `#${uuid}.draggable-node.logic-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
-      div('.node-inputs', [
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.value)  },
-            dataset: { type: 'input', name: 'value', parent: uuid, offsetX: '0', offsetY: '29' },
-          },
-          'ANGLE'
-        ),
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.threshold)  },
-            dataset: { type: 'input', name: 'threshold', parent: uuid, offsetX: '0', offsetY: '49' },
-          },
-          'THRESHOLD'
-        ),
-      ]),
-      span('.logic-node-text','CHANGE'),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
-      div('.node-outputs.center-outputs', [
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'trigger', parent: uuid, offsetX: '220', offsetY: '49' }}, ''),
-      ])
+      div('.node-inputs', R.toPairs(inputs).map(
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+      )),
+      span('.logic-node-text','Change'),
+      div('.node-outputs.center-outputs', R.toPairs(outputs).map(
+        ([key, { offsetX, offsetY }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
+      ))
     ]
   );
 };
 
 export function MarkerNode(props, marker) { 
-  const { x, y, ID, uuid, selected, input } = props;
-  const { posX, posY, rotation, present } = marker;
+  const { x, y, ID, uuid, selected, inputs, outputs } = props;
 
   return div(
     `#${uuid}.draggable-node.marker-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
-      div('.node-inputs', [
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.ID)  },
-            dataset: { type: 'input', name: 'ID', parent: uuid, offsetX: '0', offsetY: '59' },
-          },
-          'ID'
-        ),
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.timeout)  },
-            dataset: { type: 'input', name: 'timeout', parent: uuid, offsetX: '0', offsetY: '79' },
-          },
-          'TIMEOUT'
-        ),
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.source)  },
-            dataset: { type: 'input', name: 'source', parent: uuid, offsetX: '0', offsetY: '99' },
-          },
-          'SOURCE'
-        ),
-      ]),
-      generateArucoMarkerGraphic(ID),//img('.marker-node-img.unselectable', { attrs: { src: `./Assets/Markers/Marker${ID}.svg` } }), // only supports up to marker 9 :()
-      div('.node-outputs', [
-        span('.output-point.bool-data', { dataset: { type: 'output', name: 'present', parent: uuid, offsetX: '280', offsetY: '39' }}, ['DETECT', span('.marker-data', present.toString())]),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posX', parent: uuid, offsetX: '280', offsetY: '59' }}, ['X', span('.marker-data', posX)]),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'posY', parent: uuid, offsetX: '280', offsetY: '79' }}, ['Y', span('.marker-data', posY)]),
-        span('.output-point.number-data', { dataset: { type: 'output', name: 'rotation', parent: uuid, offsetX: '280', offsetY: '99' }}, ['ANGLE', span('.marker-data', rotation)]),
-      ])
+      div('.node-inputs', R.toPairs(inputs).map(
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+      )),
+      generateArucoMarkerGraphic(ID), // only supports up to marker 9 :()
+      div('.node-outputs', R.toPairs(outputs).map(
+        ([key, { offsetX, offsetY, property }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, [key, span('.marker-data', marker[property].toString())])
+      ))
     ]
   );
 };
 
 // Input Only
 export function KeyPressNode(props) {
-  const { x, y, value, uuid, selected, input } = props;
+  const { x, y, value, uuid, selected, inputs } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
-      div('.node-inputs', [
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.main)  },
-            dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' },
-          },
-          'PRESS'
-        ),
-      ]),
+      div('.node-inputs', R.toPairs(inputs).map(
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+      )),
       select(
         '.node-input.node-select-input.key-select',
         { dataset: { uuid } },
@@ -142,21 +86,15 @@ export function KeyPressNode(props) {
 }
 
 export function KeyTapNode(props) {
-  const { x, y, value, uuid, selected, input } = props;
+  const { x, y, value, uuid, selected, inputs } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
     [
-      div('.node-inputs', [
-        span('.input-point.bool-data',
-          {
-            class: { connected: !R.isNil(input.main)  },
-            dataset: { type: 'input', name: 'main', parent: uuid, offsetX: '0', offsetY: '39' },
-          },
-          'TAP'
-        ),
-      ]),
+      div('.node-inputs', R.toPairs(inputs).map(
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+      )),
       select(
         '.node-input.node-select-input.key-select',
         { dataset: { uuid } },
@@ -168,7 +106,7 @@ export function KeyTapNode(props) {
 
 // Output Only
 export function NumberNode(props) {
-  const { x, y, uuid, selected, value } = props;
+  const { x, y, uuid, selected, value, outputs } = props;
 
   return div(
     `#${uuid}.draggable-node.number-node`,
@@ -178,9 +116,9 @@ export function NumberNode(props) {
         '.node-input.node-number-input.var-number-input',
         { dataset: { uuid }, attrs: { type: 'number', min: -1000, max: 1000, value } },
       ),
-      div('.node-outputs.center-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'number', parent: uuid, offsetX: '120', offsetY: '39' } }, '')
-      ]),
+      div('.node-outputs.center-outputs', R.toPairs(outputs).map(
+        ([key, { offsetX, offsetY, property }]) => span('.output-point', { dataset: { type: 'output', valueType: 'number', name: key, parent: uuid, offsetX, offsetY } }, '')
+      ))
     ]
   )
 }
@@ -188,7 +126,7 @@ export function NumberNode(props) {
 // this should only be updated every couple of frames probs, not every update
 // document.querySelector('#test-img').src = "../frame.png?" + new Date().getTime();
 export function DetectionPanel(props) {
-  const { uuid, selected, x, y } = props;
+  const { uuid, selected, x, y, outputs } = props;
   return div('.draggable-node.detection-panel',
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
@@ -207,7 +145,7 @@ export function DetectionPanel(props) {
         input('.detection-check.camera-flip', { attrs: { type: 'checkbox' }})
       ]),
       div('.node-outputs', [
-        span('.output-point', { dataset: { type: 'output', name: 'main', valueType: 'feed', parent: uuid, offsetX: '350', offsetY: '299' } }, 'FEED')
+        span('.output-point', { dataset: { type: 'output', name: 'FEED', valueType: 'feed', parent: uuid, offsetX: outputs.FEED.offsetX, offsetY: outputs.FEED.offsetY } }, 'FEED')
       ]),
     ]
   );
