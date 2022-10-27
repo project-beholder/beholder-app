@@ -8,25 +8,24 @@ import sampleCombine from 'xstream/extra/sampleCombine';
 import renderNode from './Components/RenderNode';
 import CommandReducer from './StateManagement/CommandReducer';
 
-// TODO: Move this to another file
+
 function renderConnections(nodes) {
   const lines = Object.values(nodes)
-    .filter(R.has('output'))
+    .filter(R.has('outputs'))
     .map((n) => {
-      return n.output // to render I don't need them sorted
-        .map((o) => {
+      return R.flatten(R.values(n.outputs) // to render I don't need them sorted
+        .map((o) => o.targets.map((t) => {
+          // console.log(o, t);
           const x1 = n.x + o.offsetX;
           const y1 = n.y + o.offsetY;
-          const x2 = nodes[o.target.parent].x + o.target.offsetX;
-          const y2 = nodes[o.target.parent].y + o.target.offsetY;
+          const x2 = nodes[t.uuid].x + nodes[t.uuid].inputs[t.field].offsetX;
+          const y2 = nodes[t.uuid].y + nodes[t.uuid].inputs[t.field].offsetY;
           // const curveX = x1 + 30; // x1 + (x2 - x1)/6;
 
           const cp = Math.max(Math.abs((x2 - x1) / 2), 50);
 
           const midX1 = x1 + cp;
           const midX2 = x2 - cp;
-
-          // const midY = y1 + (y2 - y1)/2;
 
           // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
           // lets make a curve!
@@ -38,8 +37,9 @@ function renderConnections(nodes) {
                 fill: 'transparent',
               }
             });
-        });
+        })));
     });
+    // console.log(lines);
   return R.flatten(lines);
 }
 
@@ -105,6 +105,25 @@ function NodeManager(sources: any) {
     .map(([pos, held]) => ({ command: 'move', ...pos }));
   
   const connectProxy$ = xs.create();
+  const outputPressed$ = DOM.select('.output-point').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev.target.dataset;
+    });
+  const createLineDropped$ = DOM.select('.input-point').events('mouseup')
+    .filter((ev: MouseEvent) => !ev.target.classList.contains('connected'))
+    .map((ev: MouseEvent) => ev.target.dataset);
+  const connectedInputPressed$ = DOM.select('.input-point.connected').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev.target.dataset;
+    });
+
+  const removeConnection$ = connectedInputPressed$.map((data) => ({
+    command: 'remove-connection',
+    uuid: data.parent,
+    name: data.name,
+  }));
 
   // Individual node events here
   // is there a way to make this more generic? probably in dataset
@@ -122,24 +141,28 @@ function NodeManager(sources: any) {
       redo$,
       deleteCommand$,
       selectCommand$,
-      nodeValueChange$, // replace when more of this command type come in to play, ie number
+      nodeValueChange$,
+      removeConnection$, // replace when more of this command type come in to play, ie number
     )
     .fold(CommandReducer, {}).remember();
-  
-  const outputPressed$ = DOM.select('.output-point').events('mousedown')
-    .map((ev: MouseEvent) => {
-      ev.stopPropagation();
-      return ev.target.dataset;
-    });
-  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
 
   // needs to hide on mouse up and when a connection is made, but show when an output is clicked
-  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true));
-  const previewLine$ = xs.combine(outputPressed$, mousePos$, nodes$, showPreviewLine$)
-      .map(([data, mouse, nodes, show]) => {
+  const endpoint$ = xs.merge(outputPressed$, connectedInputPressed$)
+    .compose(sampleCombine(nodes$))
+    .map(([evt, nodes]) => {
+      // console.log(evt);
+      if (evt.type === 'input') {
+        const input = nodes[evt.parent].inputs[evt.name];
+        console.log(input);
+        return [nodes[input.source].outputs[input.sourceField], nodes[input.source]];
+      }
+      return [nodes[evt.parent].outputs[evt.name], nodes[evt.parent]];
+    });
+  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true), connectedInputPressed$.mapTo(true));
+  const previewLine$ = xs.combine(endpoint$, mousePos$, showPreviewLine$)
+      .map(([[data, heldNode], mouse, show]) => {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
-        const heldNode = nodes[data.parent];
 
         const x1 = heldNode.x + offsetX;
         const y1 = heldNode.y + offsetY;
@@ -173,9 +196,9 @@ function NodeManager(sources: any) {
   
   // this needs to be proxied and turned into a node update
   // lines should be rendered directly from nodes
-  const createConnection$ = createLineDropped$.compose(sampleCombine(outputPressed$, showPreviewLine$))
-      .filter(R.nth(2))
-      .map(([start, end]) => ({ command: 'connect', props: { start, end } }))
+  const createConnection$ = createLineDropped$.compose(sampleCombine(endpoint$, showPreviewLine$))
+      .filter(R.nth(2)).debug()
+      .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   
   const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)

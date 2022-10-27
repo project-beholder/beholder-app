@@ -80,8 +80,8 @@ function updateNode(node, input) {
       // set node properties for rendering
 
       // this could possibly change when displaying data live feed
-      node.output.forEach((out) => {
-        updateNode(programGraph[out.target.parent], input[node.ID][out.field]);
+      R.values(node.outputs).forEach((out) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], input[node.ID][out.property]));
       });
       break;
     case 'value-change':
@@ -90,24 +90,27 @@ function updateNode(node, input) {
       node.lastValue = input;
 
       // if threshold is exceeded, reset to zero and pass true to all children
-      if (node.threshold >= 0) {
-        if (node.totalDelta >= node.threshold) {
+      if (node.THRESHOLD >= 0) {
+        if (node.totalDelta >= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
         // need to clamp at zero
-        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+        node.totalDelta = R.clamp(0, node.THRESHOLD, node.totalDelta);
       } else {
-        if (node.totalDelta <= node.threshold) {
+        if (node.totalDelta <= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
 
-        node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
+        node.totalDelta = R.clamp(node.THRESHOLD, 0, node.totalDelta);
       }
 
       // pass trigger state to all children
-      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      // this could possibly change when displaying data live feed
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger));
+      });
       break;
     case 'angle-change':
       // add value to running tab
@@ -117,15 +120,15 @@ function updateNode(node, input) {
       node.lastValue = input;
 
       // if threshold is exceeded, reset to zero and pass true to all children
-      if (node.threshold >= 0) {
-        if (node.totalDelta >= node.threshold) {
+      if (node.THRESHOLD >= 0) {
+        if (node.totalDelta >= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
         // need to clamp at zero
-        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+        node.totalDelta = R.clamp(0, node.THRESHOLD, node.totalDelta);
       } else {
-        if (node.totalDelta <= node.threshold) {
+        if (node.totalDelta <= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
@@ -134,9 +137,11 @@ function updateNode(node, input) {
       }
 
       // pass trigger state to all children
-      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger));
+      });
       break;
-      break;
+      
     default: break;
   }
 }
@@ -146,8 +151,8 @@ function runProgram(markerData) {
     .filter(R.propEq('type', 'detection'))
     .forEach((node) => {
       // console.log(node);
-      node.output.forEach((out) => {
-        updateNode(programGraph[out.target.parent], markerData);
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], markerData));
       });
     });
 }

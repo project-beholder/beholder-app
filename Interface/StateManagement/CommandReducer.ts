@@ -32,26 +32,36 @@ export default function CommandReducer(oldNodes, action) {
       });
       break;
     case 'connect':
-      const { start, end } = action.props;
-      if (end.type === 'output' && start.type == 'input') {
-        nodes[end.parent].output.push({
-          offsetX: parseFloat(end.offsetX),
-          offsetY: parseFloat(end.offsetY),
-          field: end.name,
-          target: {
-            ...start,
-            offsetX: parseFloat(start.offsetX),
-            offsetY: parseFloat(start.offsetY),
-          },
-        });
+      // START = input, END = output and i have no idea why, maybe fix
+      const { input } = action.props;
+      const output = action.props.output[0];
+      const outParent = action.props.output[1];
+      // { uuid, field }
+      output.targets.push({ uuid: input.parent, field: input.name });
 
-        if (nodes[end.parent].type === 'number') {
-          nodes[start.parent][start.name] = parseInt(nodes[end.parent].value);
-        }
+      nodes[input.parent].inputs[input.name].source = outParent.uuid;
+      nodes[input.parent].inputs[input.name].sourceField = output.name;
+
+      if (outParent.type === 'number') {
+        nodes[input.parent][input.name] = parseInt(outParent.value);
       }
       UndoRedoManager.pushUndoState(nodes);
       // only connected 1 way atm, let's see if it works (output -> input)
       // also should validate if this is any good
+      break;
+    case 'remove-connection':
+      const inputData = nodes[action.uuid].inputs[action.name];
+      let outNode = nodes[inputData.source].outputs[inputData.sourceField];
+      console.log(action);
+      // filter out matching output
+      outNode.targets = outNode.targets.filter((target) => !(target.uuid === action.uuid && target.field === action.name));
+      // 
+      inputData.pastSource = inputData.source;
+      inputData.pastSourceField = inputData.sourceField;
+      // clear input reference
+      inputData.source = null;
+      inputData.sourceField = null;
+
       break;
     case 'select':
       const selectCount = R.values(nodes).filter(R.prop('selected')).length;
@@ -85,18 +95,20 @@ export default function CommandReducer(oldNodes, action) {
       break;
     case 'delete':
       // remove all refs to it
-      R.values(nodes).forEach((n) => {
-        console.warn('peter remove connections on delete once connections work again');
-
-        if (n.selected) {
-          R.values(nodes).forEach((n2) => {
-            if (n2.output && n2.output.length > 0) {
-              n2.output = n2.output.filter((o) => o.target.parent != n.uuid);
-            }
+      R.values(nodes).forEach((toDelete) => {
+        if (toDelete.selected) {
+          R.values(nodes).forEach((n) => {
+            R.values(n.outputs).forEach((o) => {
+              console.log(o.targets);
+              o.targets = o.targets.filter((t) => t.uuid != toDelete.uuid);
+            })
           });
           
-          delete nodes[n.uuid];
-
+          R.values(toDelete.outputs).forEach((o) => o.targets.forEach((t) => {
+            nodes[t.uuid].inputs[t.field].source = null;
+            nodes[t.uuid].inputs[t.field].sourceField = null;
+          }));
+          delete nodes[toDelete.uuid];
         }
       });
       // delete nodes[action.uuid]
@@ -118,10 +130,11 @@ export default function CommandReducer(oldNodes, action) {
 
       // if it's a variable input, send that to all child values
       if (nodes[action.uuid].type === 'number') {
-        nodes[action.uuid].output.forEach((o) => {
-          nodes[o.target.parent][o.target.name] = parseInt(action.newValue);
+        nodes[action.uuid].outputs.value.targets.forEach((t) => {
+          nodes[t.uuid][t.field] = parseInt(action.newValue);
         });
       }
+
       break;
   }
   return nodes;
