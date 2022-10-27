@@ -33,18 +33,17 @@ export default function CommandReducer(oldNodes, action) {
       break;
     case 'connect':
       // START = input, END = output and i have no idea why, maybe fix
-      const { input, output } = action.props;
-      if (output.type === 'output' && input.type == 'input') {
-        console.log(action);
-        // { uuid, field }
-        nodes[output.parent].outputs[output.name].targets.push({ uuid: input.parent, field: input.name });
+      const { input } = action.props;
+      const output = action.props.output[0];
+      const outParent = action.props.output[1];
+      // { uuid, field }
+      output.targets.push({ uuid: input.parent, field: input.name });
 
-        nodes[input.parent].inputs[input.name].source = output.parent;
-        nodes[input.parent].inputs[input.name].sourceField = output.name;
+      nodes[input.parent].inputs[input.name].source = outParent.uuid;
+      nodes[input.parent].inputs[input.name].sourceField = output.name;
 
-        if (nodes[output.parent].type === 'number') {
-          nodes[input.parent][input.name] = parseInt(nodes[output.parent].value);
-        }
+      if (outParent.type === 'number') {
+        nodes[input.parent][input.name] = parseInt(outParent.value);
       }
       UndoRedoManager.pushUndoState(nodes);
       // only connected 1 way atm, let's see if it works (output -> input)
@@ -56,6 +55,9 @@ export default function CommandReducer(oldNodes, action) {
       console.log(action);
       // filter out matching output
       outNode.targets = outNode.targets.filter((target) => !(target.uuid === action.uuid && target.field === action.name));
+      // 
+      inputData.pastSource = inputData.source;
+      inputData.pastSourceField = inputData.sourceField;
       // clear input reference
       inputData.source = null;
       inputData.sourceField = null;

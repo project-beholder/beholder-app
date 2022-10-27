@@ -110,7 +110,9 @@ function NodeManager(sources: any) {
       ev.stopPropagation();
       return ev.target.dataset;
     });
-  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
+  const createLineDropped$ = DOM.select('.input-point').events('mouseup')
+    .filter((ev: MouseEvent) => !ev.target.classList.contains('connected'))
+    .map((ev: MouseEvent) => ev.target.dataset);
   const connectedInputPressed$ = DOM.select('.input-point.connected').events('mousedown')
     .map((ev: MouseEvent) => {
       ev.stopPropagation();
@@ -145,14 +147,22 @@ function NodeManager(sources: any) {
     .fold(CommandReducer, {}).remember();
 
   // needs to hide on mouse up and when a connection is made, but show when an output is clicked
-  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true));
-  const previewLine$ = xs.combine(outputPressed$, mousePos$, nodes$, showPreviewLine$)
-      .map(([data, mouse, nodes, show]) => {
+  const endpoint$ = xs.merge(outputPressed$, connectedInputPressed$)
+    .compose(sampleCombine(nodes$))
+    .map(([evt, nodes]) => {
+      // console.log(evt);
+      if (evt.type === 'input') {
+        const input = nodes[evt.parent].inputs[evt.name];
+        console.log(input);
+        return [nodes[input.source].outputs[input.sourceField], nodes[input.source]];
+      }
+      return [nodes[evt.parent].outputs[evt.name], nodes[evt.parent]];
+    });
+  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true), connectedInputPressed$.mapTo(true));
+  const previewLine$ = xs.combine(endpoint$, mousePos$, showPreviewLine$)
+      .map(([[data, heldNode], mouse, show]) => {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
-        const heldNode = nodes[data.parent];
-
-        if (R.isNil(heldNode)) return '';
 
         const x1 = heldNode.x + offsetX;
         const y1 = heldNode.y + offsetY;
@@ -186,8 +196,8 @@ function NodeManager(sources: any) {
   
   // this needs to be proxied and turned into a node update
   // lines should be rendered directly from nodes
-  const createConnection$ = createLineDropped$.compose(sampleCombine(outputPressed$, showPreviewLine$))
-      .filter(R.nth(2))
+  const createConnection$ = createLineDropped$.compose(sampleCombine(endpoint$, showPreviewLine$))
+      .filter(R.nth(2)).debug()
       .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
   

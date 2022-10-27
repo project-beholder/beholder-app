@@ -8,10 +8,10 @@ export default function createNode(props, uuid) {
         timeout: 100, // DEFAULT_MARKER_TIMEOUT
         uuid, // Targets for outputs = { uuid, field }
         outputs: {
-          DETECT: { property: 'present', offsetX: 280, offsetY: 39, targets: [] },
-          X: { property: 'posX', offsetX: 280, offsetY: 59, targets: [] },
-          Y: { property: 'posY', offsetX: 280, offsetY: 79, targets: [] },
-          ANGLE: { property: 'rotation',offsetX: 280, offsetY: 99, targets: [] }
+          DETECT: { name: 'DETECT', property: 'present', offsetX: 280, offsetY: 39, targets: [] },
+          X: { name: 'X', property: 'posX', offsetX: 280, offsetY: 59, targets: [] },
+          Y: { name: 'Y', property: 'posY', offsetX: 280, offsetY: 79, targets: [] },
+          ANGLE: { name: 'ANGLE', property: 'rotation',offsetX: 280, offsetY: 99, targets: [] }
         },
         inputs: {
           ID: { offsetX: 0, offsetY: 59, source: null, sourceField: null },
@@ -44,7 +44,7 @@ export default function createNode(props, uuid) {
         ...props,
         value: 0,
         uuid,
-        outputs: { value: { noText: true, offsetX: 120, offsetY: 39, targets: [] } },
+        outputs: { value: { name: 'value', noText: true, offsetX: 120, offsetY: 39, targets: [] } },
         selected: false,
       };
     case 'detection':
@@ -52,7 +52,7 @@ export default function createNode(props, uuid) {
         ...props,
         camID: 0,
         uuid,
-        outputs: { FEED: { offsetX: 350, offsetY: 299, targets: [] } },
+        outputs: { FEED: { name: 'FEED', offsetX: 350, offsetY: 299, targets: [] } },
         selected: false,
       };
     case 'angle-change':
