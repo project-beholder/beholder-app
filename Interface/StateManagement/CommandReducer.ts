@@ -52,7 +52,6 @@ export default function CommandReducer(oldNodes, action) {
     case 'remove-connection':
       const inputData = nodes[action.uuid].inputs[action.name];
       let outNode = nodes[inputData.source].outputs[inputData.sourceField];
-      console.log(action);
       // filter out matching output
       outNode.targets = outNode.targets.filter((target) => !(target.uuid === action.uuid && target.field === action.name));
       // 
@@ -99,7 +98,6 @@ export default function CommandReducer(oldNodes, action) {
         if (toDelete.selected) {
           R.values(nodes).forEach((n) => {
             R.values(n.outputs).forEach((o) => {
-              console.log(o.targets);
               o.targets = o.targets.filter((t) => t.uuid != toDelete.uuid);
             })
           });

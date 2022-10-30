@@ -148,7 +148,7 @@ function runProgram(markerData) {
   Object.values(programGraph)
     .filter(R.propEq('type', 'detection'))
     .forEach((node) => {
-      // console.log(node);
+
       R.toPairs(node.outputs).forEach(([key, out]) => {
         out.targets.forEach((t) => updateNode(programGraph[t.uuid], markerData));
       });
@@ -157,10 +157,9 @@ function runProgram(markerData) {
 
 function ProgramDriver(programGraph$) {
   initKeyboard();
-  // console.log(keyThread);
+
   programGraph$.subscribe({
     next: (p) => {
-      // console.log('program set', p)
       programGraph = R.clone(p)
     },
   });

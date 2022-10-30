@@ -18,7 +18,6 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       switch(type) {
         case 'camera-feed':
           detectThread.stdin.cork();
-          // console.log(value)
           detectThread.stdin.write(`10${value}0\r\n`);
           detectThread.stdin.uncork();
           break;
@@ -86,9 +85,9 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       detectThread.stdout.on('data', (rawData) => {
         if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
 
-        if (document.querySelector('.detection-img')) document.querySelector('.detection-img').src = `../frame.jpg?${Date.now()}`;
-
+        
         const data = JSON.parse(rawData);
+        if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `../Native/LocalMarkerDetection/build/frame.jpg?${Date.now()}`;
         if (data.markers) updateMarkers(data.markers);
         
       });
