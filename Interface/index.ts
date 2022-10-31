@@ -17,7 +17,7 @@ function main(sources: any) {
   const spacebar$ = globalKeyDown$.filter((ev) => ev.key === ' ');
   const esc$ = globalKeyDown$.filter((ev) => ev.key === 'Escape');
   const rightClick$ = fromEvent(document, 'contextmenu').map((ev) => { ev.preventDefault(); return ev; });
-  const runStop$ = DOM.select('#run-button').events('click').fold((prev) => !prev, false).startWith(false);
+  const runStopButton$ = DOM.select('#run-button').events('click').fold((prev) => !prev, false).startWith(false);
 
   const mousePos$ = DOM.events('mousemove')
     .fold((pos, ev: MouseEvent) => ({
@@ -55,6 +55,7 @@ function main(sources: any) {
   //       </svg>
   const tri = '27 20, 27 50, 52 35';
   const rect = '22 22, 22 48, 48 48, 48 22';
+  const runStop$ = xs.merge(runStopButton$, nodeManager.stopEmulation$);
   const runButton$ = runStop$.map((run) =>
     button('#run-button', { class: { running: run } },
       svg({ attrs: { viewBox: '0 0 70 70' } },
