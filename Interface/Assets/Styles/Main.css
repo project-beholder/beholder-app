@@ -104,3 +104,26 @@ body {
   bottom: 0;
   left: 0;
 }
+
+#run-button {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  border-color: transparent;
+  border-radius: 75px;
+  z-index: 1000;
+  width: 70px;
+  height: 70px;
+  background-color: #00C896;
+}
+
+#run-button svg polygon {
+  fill: #fff;
+  stroke-linejoin: round;
+  stroke-width: 5;
+  stroke: #fff;
+}
+
+#run-button.running {
+  background-color: palevioletred;
+}

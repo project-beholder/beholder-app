@@ -10,6 +10,7 @@ if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/Wi
 else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 
 let keyThread;
+let shouldRun = false;
 
 function pressKey(key) {
   const hex = getKeyCode(key);
@@ -145,6 +146,8 @@ function updateNode(node, input) {
 }
 
 function runProgram(markerData) {
+  if (!shouldRun) return;
+
   Object.values(programGraph)
     .filter(R.propEq('type', 'detection'))
     .forEach((node) => {
@@ -159,7 +162,8 @@ function ProgramDriver(programGraph$) {
   initKeyboard();
 
   programGraph$.subscribe({
-    next: (p) => {
+    next: ([p, run]) => {
+      shouldRun = run;
       programGraph = R.clone(p)
     },
   });
