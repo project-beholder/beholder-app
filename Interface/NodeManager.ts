@@ -127,10 +127,20 @@ function NodeManager(sources: any) {
 
   // Individual node events here
   // is there a way to make this more generic? probably in dataset
+  // prevent input nonsense
+  DOM.select('.node-number-input').events('keydown')
+    .subscribe({
+      next: (e) => {
+        if (e.which < 48 || e.which > 57) e.preventDefault();
+      }
+    });
   const nodeValueChange$ = DOM.select('.node-input')
     .events('change')
     .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: e.target.value }));
 
+  // pause key emulation on most commands except move
+  const stopEmulation$ = xs.merge(create$, connectProxy$, undo$, redo$, deleteCommand$, nodeValueChange$, removeConnection$)
+    .mapTo(false);
   // generate node objects from all of the elements
   // move this to a function + file
   const nodes$ = xs.merge(
@@ -150,10 +160,9 @@ function NodeManager(sources: any) {
   const endpoint$ = xs.merge(outputPressed$, connectedInputPressed$)
     .compose(sampleCombine(nodes$))
     .map(([evt, nodes]) => {
-      // console.log(evt);
+
       if (evt.type === 'input') {
         const input = nodes[evt.parent].inputs[evt.name];
-        console.log(input);
         return [nodes[input.source].outputs[input.sourceField], nodes[input.source]];
       }
       return [nodes[evt.parent].outputs[evt.name], nodes[evt.parent]];
@@ -220,6 +229,7 @@ function NodeManager(sources: any) {
     DOM: vdom$,
     capturedClicks$,
     nodes$,
+    stopEmulation$, 
   }
   return sinks;
 }

@@ -38,7 +38,7 @@ export const KEY_MAPPINGS = [
   { key: '9', text: '9' },
   
   { key: 'SPACE', text: 'SPACE' },
-  { key: '↓', text: '↓' },
+  { key: '↑', text: '↑' },
   { key: '↓', text: '↓' },
   { key: '←', text: '←' },
   { key: '→', text: '→' },

@@ -3,7 +3,7 @@ import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
 import fromEvent from 'xstream/extra/fromEvent';
 import {run} from '@cycle/run';
-import {div, makeDOMDriver } from '@cycle/dom';
+import {div, button, svg, makeDOMDriver, h } from '@cycle/dom';
 
 // Local
 import NodePalette from './Components/NodePalette';
@@ -17,6 +17,7 @@ function main(sources: any) {
   const spacebar$ = globalKeyDown$.filter((ev) => ev.key === ' ');
   const esc$ = globalKeyDown$.filter((ev) => ev.key === 'Escape');
   const rightClick$ = fromEvent(document, 'contextmenu').map((ev) => { ev.preventDefault(); return ev; });
+  const runStopButton$ = DOM.select('#run-button').events('click').fold((prev) => !prev, false).startWith(false);
 
   const mousePos$ = DOM.events('mousemove')
     .fold((pos, ev: MouseEvent) => ({
@@ -49,18 +50,33 @@ function main(sources: any) {
     palette.create$
   ));
 
-  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM)
-    .map(([creator, manager]) =>
+  // <svg id="triangle" viewBox="0 0 100 100">
+  //           	<polygon points="50 15, 100 100, 0 100"/>
+  //       </svg>
+  const tri = '27 20, 27 50, 52 35';
+  const rect = '22 22, 22 48, 48 48, 48 22';
+  const runStop$ = xs.merge(runStopButton$, nodeManager.stopEmulation$);
+  const runButton$ = runStop$.map((run) =>
+    button('#run-button', { class: { running: run } },
+      svg({ attrs: { viewBox: '0 0 70 70' } },
+        h('polygon', { attrs: { points: run ? rect : tri } })
+      )
+    )
+  ); 
+
+  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM, runButton$)
+    .map(([creator, manager, runButton]) =>
       div("#cycle-root", [
         creator,
         manager,
+        runButton,
       ])
     );
 
   // Peak at the detection driver
-  sources.WebcamDetection.subscribe({
-    next: (m) => { return; },
-  });
+  // sources.WebcamDetection.subscribe({
+  //   next: (m) => { return; },
+  // });
 
   const feedChange$ = DOM.select('.camera-select').events('change').map((ev) => ({ type: 'camera-feed', value: ev.target.value }));
   const flipCamera$ = DOM.select('.camera-flip').events('change').map((ev) => ({ type: 'flip', value: ev.target.checked ? 1 : 0 }));
@@ -68,7 +84,7 @@ function main(sources: any) {
   return {
     DOM: vdom$,
     WebcamDetection: xs.merge(feedChange$, flipCamera$),
-    ProgramManager: nodeManager.nodes$,
+    ProgramManager: xs.combine(nodeManager.nodes$, runStop$),
   };
 }
 
