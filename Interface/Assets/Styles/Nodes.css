@@ -1,59 +1,4 @@
 /* Base node css */
-:root {
-  --gray-mid: #777777;
-  --gray-dark: #222222;
-  --gray-light: #F0F0F0;
-
-  --node-padding-horizontal: 15px;
-  --node-padding-vertical: 15px;
-
-  --io-height: 20px;
-  --io-point-diameter: 12px;
-
-  --marker-node-w: 280px;
-  --marker-node-h: 120px;
-
-  --number-node-w: 120px;
-  --number-node-h: 60px;
-
-  --detection-node-w: 350px;
-  --detection-node-h: 320px;
-
-  --logic-node-w: 220px;
-  --logic-node-h: 70px;
-
-  --send-node-w: 150px;
-  --send-node-h: 60px;
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 200;
-  src: url(fonts/Inter-Light.ttf);
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  src: url(fonts/Inter-Regular.ttf);
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  src: url(fonts/Inter-SemiBold.ttf);
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 800;
-  src: url(fonts/Inter-ExtraBold.ttf);
-}
-
 .draggable-node {
   top: 0;
   left: 0;
@@ -324,4 +269,32 @@ span.logic-node-text {
 .node-select-input option {
   font-size: 15px;
 }
+
+.key-node.isDown {
+  background-color: var(--main-green-color);
+  color: white;
+  border-color: transparent;
+}
+
+/* .key-node::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  content: '';
+  z-index: var(--node-feedback-z);
+  width: calc(var(--send-node-w) - 6px);
+  height: calc(var(--send-node-h) - 6px);
+  transition: all 100ms ease-out;
+  border: 0px solid white;
+  border-radius: 5px;
+  box-shadow: 0px 0px 0px 0px transparent;
+} */
+
+/* .key-node.isDown::after {
+  border: 4px solid white;
+  top: -1px;
+  left: -1px;
+  transition: all 0ms;
+  box-shadow: 0px 0px 0px 2px var(--play-color);
+} */
 /* 240 : 480 for  aspect ratio */

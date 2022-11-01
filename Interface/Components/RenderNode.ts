@@ -39,7 +39,7 @@ export function AngleChangeNode(props) {
       div('.node-inputs', R.toPairs(inputs).map(
         ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
-      span('.logic-node-text','Change'),
+      span('.logic-node-text','θ Change'),
       div('.node-outputs.center-outputs', R.toPairs(outputs).map(
         ([key, { offsetX, offsetY }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
       ))
@@ -67,11 +67,11 @@ export function MarkerNode(props, marker) {
 
 // Input Only
 export function KeyPressNode(props) {
-  const { x, y, value, uuid, selected, inputs } = props;
+  const { x, y, value, uuid, selected, inputs, isDown } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { isDown, selected },  dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
         ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
@@ -86,11 +86,11 @@ export function KeyPressNode(props) {
 }
 
 export function KeyTapNode(props) {
-  const { x, y, value, uuid, selected, inputs } = props;
+  const { x, y, value, uuid, selected, inputs, isDown } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected },  dataset: { uuid } },
+    { style: { transform: `translate(${x}px, ${y}px)` }, class: { isDown, selected },  dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
         ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)

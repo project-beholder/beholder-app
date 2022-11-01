@@ -146,7 +146,13 @@ function updateNode(node, input) {
 }
 
 function runProgram(markerData) {
-  if (!shouldRun) return;
+  if (!shouldRun) {
+    // make sure nodes aren't showing trigger
+    Object.values(programGraph)
+      .filter(R.propSatisfies(R.includes('key'), 'type'))
+      .forEach((n) => n.isDown = false);
+    return;
+  }
 
   Object.values(programGraph)
     .filter(R.propEq('type', 'detection'))
@@ -164,7 +170,7 @@ function ProgramDriver(programGraph$) {
   programGraph$.subscribe({
     next: ([p, run]) => {
       shouldRun = run;
-      programGraph = R.clone(p)
+      programGraph = p;
     },
   });
 
