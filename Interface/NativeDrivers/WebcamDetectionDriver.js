@@ -39,8 +39,6 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
 
   // runs detection every frame for now
   const detectionLoop = () => {
-    requestAnimationFrame(detectionLoop);
-
     const currTime = Date.now();
     const dt = currTime - prevDetectTime;
     prevDetectTime = currTime;
@@ -53,6 +51,8 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       detectThread.stdin.cork();
       detectThread.stdin.write(`001${shouldFlip}\r\n`);
       detectThread.stdin.uncork();
+    } else {
+      requestAnimationFrame(detectionLoop);
     }
   }
 
@@ -85,11 +85,23 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       detectThread.stdout.on('data', (rawData) => {
         if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
 
-        
-        const data = JSON.parse(rawData);
-        if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `../Native/LocalMarkerDetection/build/frame.jpg?${Date.now()}`;
-        if (data.markers) updateMarkers(data.markers);
-        
+        // sometimes the message is bad and doubled, we drop them for now
+        try {
+          const data = JSON.parse(rawData);
+
+          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `../Native/LocalMarkerDetection/build/frame.jpg?${Date.now()}`;
+          if (data.markers) {
+            updateMarkers(data.markers);
+            requestAnimationFrame(detectionLoop);
+          }
+        } catch (error) {
+          // console.log(error, rawData.toString());
+          // THIS PROBABLY HAPPENED BC TWO MESSAGES AT THE SAME TIME
+          // below gets a new array, right now we just drop the frame
+          // const regex = /\n/g;
+          // console.log(rawData.toString().split(regex));
+          requestAnimationFrame(detectionLoop);
+        }
       });
 
       // start the detection parade
