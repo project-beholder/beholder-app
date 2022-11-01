@@ -33,6 +33,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   if (process.platform === 'win32') detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker.exe');
   else detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
   detectThread.stdin.setDefaultEncoding('utf-8');
+  window.addEventListener("beforeunload", () => { detectThread.kill() });
 
   let prevDetectTime = Date.now();
   let detectFrameTime = 0;
@@ -83,7 +84,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       }
 
       detectThread.stdout.on('data', (rawData) => {
-        if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
+        // if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
 
         // sometimes the message is bad and doubled, we drop them for now
         try {
@@ -117,20 +118,3 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   const detection$ = xs.create(detectedProducer);
   return detection$;
 }
-
-// if we find the process is not killing it properly
-  // // Make sure to kill the child process on exit or mem leak
-  // process.on('SIGINT', () => {
-  //   console.log('Killing child process 1');
-  //   detectThread.kill();
-  //   process.exit(0);
-  // });
-  // process.on('SIGTERM', () => {
-  //   console.log('Killing child process 2');
-  //   detectThread.kill();
-  //   process.exit(0);
-  // });
-  // process.on('exit', () => {
-  //   console.log('Killing child process 3');
-  //   detectThread.kill();
-  // });

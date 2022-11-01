@@ -29,6 +29,7 @@ function releaseKey(key) {
 function initKeyboard() {
   if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation.exe');
   else keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
+  window.addEventListener("beforeunload", () => { keyThread.kill() });
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
       // console.log(`stdout keyboard: ${rawData}`);
@@ -39,7 +40,7 @@ function initKeyboard() {
   process.on('SIGINT', () => { process.exit(0); });
   process.on('SIGTERM', () => { process.exit(0); });
   process.on('exit', () => {
-      console.log('Killing child process');
+      console.log('Killing thread child process');
       keyThread.kill();
   });
 }
