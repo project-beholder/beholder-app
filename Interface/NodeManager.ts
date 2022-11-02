@@ -44,7 +44,7 @@ function renderConnections(nodes) {
 }
 
 function NodeManager(sources: any) {
-  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
+  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$, loadedNodes$ } = sources;
 
   const nodeMouseDown$ = DOM.select('.draggable-node').events('mousedown')
     .map((ev: MouseEvent) => {
@@ -141,6 +141,7 @@ function NodeManager(sources: any) {
   // pause key emulation on most commands except move
   const stopEmulation$ = xs.merge(create$, connectProxy$, undo$, redo$, deleteCommand$, nodeValueChange$, removeConnection$)
     .mapTo(false);
+
   // generate node objects from all of the elements
   // move this to a function + file
   const nodes$ = xs.merge(
@@ -152,6 +153,7 @@ function NodeManager(sources: any) {
       deleteCommand$,
       selectCommand$,
       nodeValueChange$,
+      loadedNodes$.map(l => ({ command: 'load', newNodes: l })),
       removeConnection$, // replace when more of this command type come in to play, ie number
     )
     .fold(CommandReducer, {}).remember();
@@ -209,14 +211,17 @@ function NodeManager(sources: any) {
       .filter(R.nth(2)).debug()
       .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
-  
-  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)
-    .map(([nodes, previewLine, markerData]) => {
+
+  const connectionInfo$ = xs.combine(endpoint$, mousePos$, showPreviewLine$).startWith([[{ valueType: '' }], '', false]);
+  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection, connectionInfo$)
+    .map(([nodes, previewLine, markerData, connectionInfo]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
+      const [[{ valueType }], _, isConnecting] = connectionInfo;
+      // console.log(valueType, isConnecting);
 
       // do svg lines here from nodes data
-      return div([
+      return div({ class: { isConnecting }, dataset: { connectingValueType: valueType } }, [
         ...Object.values(nodes).map((n) => renderNode(n, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
