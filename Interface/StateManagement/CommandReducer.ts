@@ -127,6 +127,8 @@ export default function CommandReducer(oldNodes, action) {
       break;
     case 'value-change':
       // UndoRedoManager.pushUndoState(nodes);
+      // bail if node was deleted before change event registered
+      if (R.isNil(nodes[action.uuid])) break;
 
       // if it's a variable input, send that to all child values
       if (nodes[action.uuid].type === 'number') {
