@@ -107,7 +107,6 @@ export function KeyTapNode(props) {
 // Output Only
 export function NumberNode(props) {
   const { x, y, uuid, selected, value, outputs } = props;
-  // console.log(value);
 
   return div(
     `#${uuid}.draggable-node.number-node`,

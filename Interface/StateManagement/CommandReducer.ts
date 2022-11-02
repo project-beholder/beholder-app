@@ -36,6 +36,9 @@ export default function CommandReducer(oldNodes, action) {
       const { input } = action.props;
       const output = action.props.output[0];
       const outParent = action.props.output[1];
+
+      // bail if number is -1 trying to connect to marker
+      if (outParent.type === 'number' && parseInt(outParent.value) < 0 && nodes[input.parent].type === 'marker') break;
       // { uuid, field }
       output.targets.push({ uuid: input.parent, field: input.name });
 
@@ -123,15 +126,27 @@ export default function CommandReducer(oldNodes, action) {
       }
       break;
     case 'value-change':
-      nodes[action.uuid][action.prop] = action.newValue;
       // UndoRedoManager.pushUndoState(nodes);
 
       // if it's a variable input, send that to all child values
       if (nodes[action.uuid].type === 'number') {
+        const hasMarkerChild = R.any(R.propEq('type', 'marker'), nodes[action.uuid].outputs.value.targets.map((t) => nodes[t.uuid]));
+
+        // hack to prevent silly number nonsense
+        action.newValue = parseInt(action.newValue);
+        if (R.type(action.newValue) !== 'Number' || (action.newValue < 0 && hasMarkerChild)) {
+          // console.log(.value);
+          action.newValue = 0;
+          document.getElementById(action.uuid).querySelector('input').value = action.newValue;
+          console.warn('prevented error with number input');
+        }
+
         nodes[action.uuid].outputs.value.targets.forEach((t) => {
           nodes[t.uuid][t.field] = parseInt(action.newValue);
         });
       }
+
+      nodes[action.uuid][action.prop] = action.newValue;
 
       break;
   }
