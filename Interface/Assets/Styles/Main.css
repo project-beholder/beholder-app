@@ -27,10 +27,14 @@
   --node-z: 10;
   --node-feedback-z: 11;
 
+  /* Palette: https://coolors.co/palette/e63c78-ffd264-00c896-0082be-82508c */
   --main-green-color:#00C896;
   --main-pink-color: #e63c78;
   --play-color: var(--main-green-color);
   --stop-color: #aaa;
+
+  --background-color: #ddd;
+  --background-tile-size: 20px;
 }
 
 @font-face {
@@ -76,11 +80,15 @@ html {
 
 body {
   overflow: hidden;
-  background-size: 25px 25px;
+  /* background-size: 25px 25px;
   background-image: linear-gradient(to right, white 40%, transparent 40%, transparent 60%, white 60%),
     linear-gradient(to bottom, white 40%, transparent 40%, transparent 60%, white 60%),
     linear-gradient(to right, transparent 48%, lightgrey 48%, lightgrey 52%, transparent 52%),
-    linear-gradient(to bottom, transparent 48%, lightgrey 48%, lightgrey 52%, transparent 52%);
+    linear-gradient(to bottom, transparent 48%, lightgrey 48%, lightgrey 52%, transparent 52%); */
+  background: white;
+  background-image: radial-gradient(var(--background-color) 1px, transparent 0);
+  background-size: var(--background-tile-size) var(--background-tile-size);
+  background-position: calc(var(--background-tile-size) / 2 - 1px) calc(var(--background-tile-size) / 2 - 1px);
 }
 
 #cycle-root {
@@ -125,7 +133,7 @@ body {
 }
 
 .connection-path {
-  stroke:#000;
+  stroke:black;
   stroke-width: 5px;
   /* stroke-width:2;
   stroke-dasharray: 5; */
@@ -191,4 +199,30 @@ body {
 
 #run-button.running {
   background-color: var(--stop-color);
+}
+
+#save-button {
+  position: absolute;
+  right: 30px;
+  top: 120px;
+  width: 70px;
+  height: 70px;
+  z-index: 100;
+  
+}
+#save-button img {
+  width: 100%;
+}
+
+#load-button {
+  position: absolute;
+  right: 30px;
+  top: 210px;
+  width: 70px;
+  height: 70px;
+  z-index: 100;
+  
+}
+#load-button img {
+  width: 100%;
 }

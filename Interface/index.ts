@@ -3,7 +3,7 @@ import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
 import fromEvent from 'xstream/extra/fromEvent';
 import {run} from '@cycle/run';
-import {div, button, svg, makeDOMDriver, h } from '@cycle/dom';
+import {div, button, svg, makeDOMDriver, h, a, img } from '@cycle/dom';
 
 // Local
 import NodePalette from './Components/NodePalette';
@@ -64,12 +64,17 @@ function main(sources: any) {
     )
   ); 
 
-  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM, runButton$)
-    .map(([creator, manager, runButton]) =>
+  const saveButton$ = nodeManager.nodes$.map((n) =>
+    a('#save-button', { attrs: { href: `data:text/plain;charset=utf-8,${JSON.stringify(n)}`, download: 'beholder_file.json' } }, img({ attrs: { src: './Assets/SVG/save.svg' } }))
+  );
+
+  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM, runButton$, saveButton$)
+    .map(([creator, manager, runButton, saveButton]) =>
       div("#cycle-root", [
         creator,
         manager,
         runButton,
+        saveButton,
       ])
     );
 

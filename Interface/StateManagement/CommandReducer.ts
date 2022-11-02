@@ -6,6 +6,11 @@ import * as R from 'ramda';
 import UndoRedoManager from './UndoRedoManager';
 import createNode from './CreateNode';
 
+function recursiveGetUUID(nodes) {
+  const newID = uuidv4();
+  if (!R.isNil(nodes[newID])) return recursiveGetUUID(nodes);
+  return newID
+}
 
 // This is a giant function :()
 // maybe turn into a map, that just returns based on key. Only local var is "nodes"
@@ -19,7 +24,7 @@ export default function CommandReducer(oldNodes, action) {
         console.warn(`can't have 2 detection feeds atm`);
         return nodes; // bail if trying to create another detection node
       }
-      const uuid = uuidv4();
+      const uuid = recursiveGetUUID(nodes);
       nodes[uuid] = createNode(action.props, uuid);
       UndoRedoManager.pushUndoState(nodes);
       break;
@@ -36,6 +41,7 @@ export default function CommandReducer(oldNodes, action) {
       const { input } = action.props;
       const output = action.props.output[0];
       const outParent = action.props.output[1];
+      if (output.valueType != input.valueType) break;
 
       // bail if number is -1 trying to connect to marker
       if (outParent.type === 'number' && parseInt(outParent.value) < 0 && nodes[input.parent].type === 'marker') break;

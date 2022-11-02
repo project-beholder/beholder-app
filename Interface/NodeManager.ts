@@ -209,14 +209,17 @@ function NodeManager(sources: any) {
       .filter(R.nth(2)).debug()
       .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
-  
-  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)
-    .map(([nodes, previewLine, markerData]) => {
+
+  const connectionInfo$ = xs.combine(endpoint$, mousePos$, showPreviewLine$).startWith([[{ valueType: '' }], '', false]);
+  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection, connectionInfo$)
+    .map(([nodes, previewLine, markerData, connectionInfo]) => {
       const connectionLines = renderConnections(nodes);
       connectionLines.push(previewLine);
+      const [[{ valueType }], _, isConnecting] = connectionInfo;
+      // console.log(valueType, isConnecting);
 
       // do svg lines here from nodes data
-      return div([
+      return div({ class: { isConnecting }, dataset: { connectingValueType: valueType } }, [
         ...Object.values(nodes).map((n) => renderNode(n, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);

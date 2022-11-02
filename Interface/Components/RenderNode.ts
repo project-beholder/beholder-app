@@ -19,11 +19,11 @@ export function ChangeNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
-        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+        ([key, { offsetX, offsetY, source, valueType }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', valueType, name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
       span('.logic-node-text','Change'),
       div('.node-outputs.center-outputs', R.toPairs(outputs).map(
-        ([key, { offsetX, offsetY }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
+        ([key, { offsetX, offsetY, valueType }]) => span('.output-point', { dataset: { type: 'output', valueType, name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
       ))
     ]
   );
@@ -37,11 +37,11 @@ export function AngleChangeNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
-        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+        ([key, { offsetX, offsetY, source, valueType }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', valueType, name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
       span('.logic-node-text','θ Change'),
       div('.node-outputs.center-outputs', R.toPairs(outputs).map(
-        ([key, { offsetX, offsetY }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
+        ([key, { offsetX, offsetY, valueType }]) => span('.output-point', { dataset: { type: 'output', valueType, name: key, parent: uuid, offsetX, offsetY } }, '') // we are hiding this text for now
       ))
     ]
   );
@@ -55,11 +55,11 @@ export function MarkerNode(props, marker) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
-        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+        ([key, { offsetX, offsetY, source, valueType }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', valueType, name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
       generateArucoMarkerGraphic(ID), // only supports up to marker 9 :()
       div('.node-outputs', R.toPairs(outputs).map(
-        ([key, { offsetX, offsetY, property }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY } }, [key, span('.marker-data', marker[property].toString())])
+        ([key, { offsetX, offsetY, property, valueType }]) => span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY, valueType } }, [key, span('.marker-data', marker[property].toString())])
       ))
     ]
   );
@@ -74,7 +74,7 @@ export function KeyPressNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { isDown, selected },  dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
-        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', valueType: 'bool', name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
       select(
         '.node-input.node-select-input.key-select',
@@ -93,7 +93,7 @@ export function KeyTapNode(props) {
     { style: { transform: `translate(${x}px, ${y}px)` }, class: { isDown, selected },  dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
-        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', name: key, parent: uuid, offsetX, offsetY } }, key)
+        ([key, { offsetX, offsetY, source }]) => span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', valueType: 'bool', name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
       select(
         '.node-input.node-select-input.key-select',
