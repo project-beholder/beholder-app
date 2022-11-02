@@ -157,6 +157,9 @@ export default function CommandReducer(oldNodes, action) {
       nodes[action.uuid][action.prop] = action.newValue;
 
       break;
+    case 'load':
+      nodes = action.newNodes;
+      break;
   }
   return nodes;
 }

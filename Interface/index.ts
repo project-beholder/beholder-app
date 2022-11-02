@@ -3,7 +3,7 @@ import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
 import fromEvent from 'xstream/extra/fromEvent';
 import {run} from '@cycle/run';
-import {div, button, svg, makeDOMDriver, h, a, img } from '@cycle/dom';
+import {div, button, svg, makeDOMDriver, h, a, img, input, label } from '@cycle/dom';
 
 // Local
 import NodePalette from './Components/NodePalette';
@@ -28,6 +28,12 @@ function main(sources: any) {
       oldDx: ev.movementX,
       oldDy: ev.movementY,
     }), { x: 0, y: 0, dx: 0, dy: 0 });
+
+  const loadedNodes$ = DOM.select('#load-input').events('change')
+    .map(e => e.target.files)
+    .map(R.last)
+    .map((f) => xs.fromPromise(fetch(f.path).then(res => res.json())))
+    .flatten();
   
   // .map((ev: MouseEvent) => ({ x: ev.clientX, y: ev.clientY, dx: ev.movementX, dy: ev.movementY }));
 
@@ -43,7 +49,7 @@ function main(sources: any) {
     .startWith({ display: false, position: { x: 0, y: 0 } });
 
   const palette = NodePalette({ DOM: sources.DOM, props$: paletteProp$ });
-  const nodeManager = NodeManager({ ...sources, mouseUp$, globalMouseDown$, globalKeyDown$, mousePos$, create$: palette.create$ });
+  const nodeManager = NodeManager({ ...sources, mouseUp$, globalMouseDown$, globalKeyDown$, mousePos$, create$: palette.create$, loadedNodes$ });
 
   paletteHideProxy$.imitate(xs.merge(
     nodeManager.capturedClicks$,
@@ -68,15 +74,10 @@ function main(sources: any) {
     a('#save-button', { attrs: { href: `data:text/plain;charset=utf-8,${JSON.stringify(n)}`, download: 'beholder_file.json' } }, img({ attrs: { src: './Assets/SVG/save.svg' } }))
   );
 
-  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM, runButton$, saveButton$)
-    .map(([creator, manager, runButton, saveButton]) =>
-      div("#cycle-root", [
-        creator,
-        manager,
-        runButton,
-        saveButton,
-      ])
-    );
+  const loadButton$ = xs.of(label('#load-button', [input('#load-input', { attrs: { type: 'file', accept: '.json' } }), img({ attrs: { src: './Assets/SVG/load.svg' } })]));
+
+  const vdom$ = xs.combine(palette.DOM, nodeManager.DOM, runButton$, saveButton$, loadButton$)
+    .map((children) => div("#cycle-root", children));
 
   // Peak at the detection driver
   // sources.WebcamDetection.subscribe({
