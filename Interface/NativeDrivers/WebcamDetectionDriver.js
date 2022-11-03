@@ -2,6 +2,9 @@
 const Marker = require('./NativeDrivers/Utils/Marker.js');
 const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
 
+let detectExePath = `./Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`;
+const detectImgPath = `${ELECTRON_ENV == 'PROD' ? '../' : ''}../Native/LocalMarkerDetection/build/frame.jpg?`;
+
 const AXIS_VEC = new Vec2(1.0, 0);
 
 function WebcamDetectionDriver(cameraFeedChanges$) {
@@ -29,9 +32,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   })
 
   // detection thread init
-  let detectThread;
-  if (process.platform === 'win32') detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker.exe');
-  else detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
+  const detectThread = spawn(detectExePath);
   detectThread.stdin.setDefaultEncoding('utf-8');
   window.addEventListener("beforeunload", () => { detectThread.kill() });
 
@@ -90,7 +91,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
         try {
           const data = JSON.parse(rawData);
 
-          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `../Native/LocalMarkerDetection/build/frame.jpg?${Date.now()}`;
+          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `${detectImgPath}${Date.now()}`;
           if (data.markers) {
             updateMarkers(data.markers);
             requestAnimationFrame(detectionLoop);

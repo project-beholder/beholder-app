@@ -12,9 +12,10 @@
   </head>
   <body>
     <section id="main-app"></section>
+    <!-- WHEN BUILDING, change this to PROD -->
+    <script>const ELECTRON_ENV = 'DEV';</script>
     <script src="./NativeDrivers/ProgramDriver.js"></script>
     <script src="./NativeDrivers/WebcamDetectionDriver.js"></script>
     <script src="../dist/bundle.js"></script>
-    
   </body>
 </html>

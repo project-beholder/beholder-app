@@ -4,6 +4,7 @@ const R = require('ramda');
 // const Vec2 = require('./Utils/Vec2.js');
 const xs = require('xstream').default;
 
+const keyEmulationPath = `./Native/KeyboardEmulation/build/keyboardEmulation${process.platform == 'win32' ? '.exe' : ''}`;
 
 let getKeyCode;
 if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
@@ -27,8 +28,7 @@ function releaseKey(key) {
 }
 
 function initKeyboard() {
-  if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation.exe');
-  else keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
+  keyThread = spawn(keyEmulationPath);
   window.addEventListener("beforeunload", () => { keyThread.kill() });
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
