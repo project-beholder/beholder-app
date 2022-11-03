@@ -32,6 +32,7 @@
   --main-pink-color: #e63c78;
   --play-color: var(--main-green-color);
   --stop-color: #CC2222;
+  --illegal-color: #BBBBBB;
 
   --background-color: #ddd;
   --background-tile-size: 20px;

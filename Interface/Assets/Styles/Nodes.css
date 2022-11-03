@@ -301,20 +301,20 @@ span.logic-node-text {
 /* 240 : 480 for  aspect ratio */
 
 /* fancy connection logic css */
-.isConnecting .input-point { color: var(--stop-color); }
+.isConnecting .input-point { color: var(--illegal-color); }
 .isConnecting .input-point::after {
-  background-color: var(--stop-color);
-  border: 2px solid var(--stop-color);
+  background-color: var(--illegal-color);
+  border: 2px solid var(--illegal-color);
 }
 
 .isConnecting .input-point:hover:after {
   width: calc(var(--io-point-diameter));
   height: calc(var(--io-point-diameter));
-  background-color: var(--stop-color);
-  border: 2px solid var(--stop-color);
+  background-color: var(--illegal-color);
+  border: 2px solid var(--illegal-color);
   top: calc(var(--io-height) - var(--io-point-diameter) + 1px);
   left: calc(calc(var(--io-point-diameter) * -0.5) + calc(var(--node-padding-horizontal) * -1));
-  border: 2px solid var(--stop-color);
+  border: 2px solid var(--illegal-color);
   border-radius: calc(var(--io-point-diameter) * 0.5);
 }
 

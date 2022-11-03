@@ -222,7 +222,7 @@ function NodeManager(sources: any) {
 
       // do svg lines here from nodes data
       return div({ class: { isConnecting }, dataset: { connectingValueType: valueType } }, [
-        ...Object.values(nodes).map((n) => renderNode(n, markerData)), // render nodes
+        ...Object.values(nodes).map((n) => renderNode[n.type](n, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });

@@ -25,7 +25,7 @@ export default function CommandReducer(oldNodes, action) {
         return nodes; // bail if trying to create another detection node
       }
       const uuid = recursiveGetUUID(nodes);
-      nodes[uuid] = createNode(action.props, uuid);
+      nodes[uuid] = createNode[action.props.type](action.props, uuid);
       UndoRedoManager.pushUndoState(nodes);
       break;
     case 'move':
