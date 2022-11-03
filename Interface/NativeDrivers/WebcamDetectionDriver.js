@@ -90,7 +90,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
         try {
           const data = JSON.parse(rawData);
           console.log(data)
-          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `../../Native/LocalMarkerDetection/build/frame.jpg?${Date.now()}`;
+          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `../../../Native/LocalMarkerDetection/build/frame.jpg?${Date.now()}`;
           if (data.markers) {
             updateMarkers(data.markers);
             requestAnimationFrame(detectionLoop);
