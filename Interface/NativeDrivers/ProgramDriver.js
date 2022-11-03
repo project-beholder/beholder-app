@@ -1,10 +1,6 @@
-const { spawn, exec } = require('node:child_process');
-const process = require('node:process');
-const R = require('ramda');
-// const Vec2 = require('./Utils/Vec2.js');
-const xs = require('xstream').default;
-
-const keyEmulationPath = `./Native/KeyboardEmulation/build/keyboardEmulation${process.platform == 'win32' ? '.exe' : ''}`;
+// console.log(path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`));
+let keyEmulationPath = `./Native/KeyboardEmulation/build/keyboardEmulation${process.platform == 'win32' ? '.exe' : ''}`;
+if (IS_MAC_PROD) keyEmulationPath = path.join(__dirname, '../../../Native/KeyboardEmulation/build/keyboardEmulation');
 
 let getKeyCode;
 if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');

@@ -1,9 +1,10 @@
-// const { spawn } = require('node:child_process');
 const Marker = require('./NativeDrivers/Utils/Marker.js');
 const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
 
 let detectExePath = `./Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`;
-const detectImgPath = `${ELECTRON_ENV == 'PROD' ? '../' : ''}../Native/LocalMarkerDetection/build/frame.jpg?`;
+if (IS_MAC_PROD) detectExePath = path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`);
+let detectImgPath = '../Native/LocalMarkerDetection/build/frame.jpg?';
+if (ELECTRON_ENV == 'PROD') detectImgPath = path.join(__dirname, '../../../Native/LocalMarkerDetection/build/frame.jpg?');
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
