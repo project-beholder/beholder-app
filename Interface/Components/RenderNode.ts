@@ -68,6 +68,7 @@ export function MarkerNode(props, marker) {
 // Input Only
 export function KeyPressNode(props) {
   const { x, y, value, uuid, selected, inputs, isDown } = props;
+  console.log(props)
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
@@ -79,7 +80,7 @@ export function KeyPressNode(props) {
       select(
         '.node-input.node-select-input.key-select',
         { dataset: { uuid } },
-        KEY_MAPPINGS.map((k) => option({ attrs: { value: k.value, selected: (k.value === value)} }, k.text))
+        KEY_MAPPINGS.map((k) => option({ attrs: { value: k.key, selected: (k.key == value)} }, k.text))
       ),
     ]
   )
@@ -98,7 +99,7 @@ export function KeyTapNode(props) {
       select(
         '.node-input.node-select-input.key-select',
         { dataset: { uuid } },
-        KEY_MAPPINGS.map((k) => option({ attrs: { value: k.value, selected: (k.value === value)} }, k.text))
+        KEY_MAPPINGS.map((k) => option({ attrs: { value: k.key, selected: (k.key === value)} }, k.text))
       ),
     ]
   )
