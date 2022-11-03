@@ -39,7 +39,7 @@
     },
     "files": [
       "./main.js",
-      "./index.html",
+      "./Interface/index.html",
       "Interface/Assets/**/*",
       "Interface/NativeDrivers/**/*",
       "build",

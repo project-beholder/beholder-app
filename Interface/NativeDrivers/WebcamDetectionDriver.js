@@ -1,6 +1,6 @@
 // const { spawn } = require('node:child_process');
-const Marker = require('./Interface/NativeDrivers/Utils/Marker.js');
-const Vec2 = require('./Interface/NativeDrivers/Utils/Vec2.js');
+const Marker = require('./NativeDrivers/Utils/Marker.js');
+const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
 
 const AXIS_VEC = new Vec2(1.0, 0);
 

@@ -7,8 +7,8 @@ const xs = require('xstream').default;
 
 
 let getKeyCode;
-if (process.platform === 'win32') getKeyCode = require('./Interface/NativeDrivers/Utils/WinKeyMap.js');
-else getKeyCode = require('./Interface/NativeDrivers/Utils/MacKeyMap.js');
+if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
+else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 
 let keyThread;
 let shouldRun = false;
