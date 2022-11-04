@@ -5,6 +5,7 @@ import { createNumberNode } from "../Components/NumberNode";
 import { createDetectionPanel } from "../Components/DetectionNode";
 import { createAngleChangeNode } from "../Components/AngleChangeNode";
 import { createValueChangeNode } from "../Components/ValueChangeNode";
+import { createANDLogicNode } from "../Components/ANDLogicNode";
 
 export default {
   marker: createMarkerNode,
@@ -14,4 +15,5 @@ export default {
   detection: createDetectionPanel,
   'value-change': createValueChangeNode,
   'angle-change': createAngleChangeNode,
+  AND: createANDLogicNode,
 };

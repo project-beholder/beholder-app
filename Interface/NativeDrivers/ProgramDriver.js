@@ -43,7 +43,7 @@ function initKeyboard() {
 
 
 let programGraph = {}
-function updateNode(node, input) {
+function updateNode(node, input, field) {
   let trigger = false;
   switch (node.type) {
     case 'key-press':
@@ -77,7 +77,7 @@ function updateNode(node, input) {
 
       // this could possibly change when displaying data live feed
       R.values(node.outputs).forEach((out) => {
-        out.targets.forEach((t) => updateNode(programGraph[t.uuid], input[node.ID][out.property]));
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], input[node.ID][out.property], t.field));
       });
       break;
     case 'value-change':
@@ -105,7 +105,7 @@ function updateNode(node, input) {
       // pass trigger state to all children
       // this could possibly change when displaying data live feed
       R.toPairs(node.outputs).forEach(([key, out]) => {
-        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger));
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger, t.field));
       });
       break;
     case 'angle-change':
@@ -134,7 +134,19 @@ function updateNode(node, input) {
 
       // pass trigger state to all children
       R.toPairs(node.outputs).forEach(([key, out]) => {
-        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger));
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger, t.field));
+      });
+      break;
+    case 'AND':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A && node.B);
+      
+      // // add value to running tab
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
       });
       break;
       

@@ -21,6 +21,7 @@ function view(display$, position$) {
         div('.palette-category', ['VARIABLES', ul([button('.create-button', { dataset: { type: 'number' } }, 'Number')])]),
         div('.palette-category', ['MARKER', ul([button('.create-button', { dataset: { type: 'marker' } }, 'Detect Marker')])]),
         div('.palette-category', ['LOGIC', ul([
+          button('.create-button', { dataset: { type: 'AND' } }, 'AND Gate'),
           button('.create-button', { dataset: { type: 'value-change' } }, 'Value Change Trigger'),
           button('.create-button', { dataset: { type: 'angle-change' } }, 'Angle Change Trigger'),
         ])]),

@@ -6,7 +6,6 @@ import { KEY_MAPPINGS } from '../Constants/Keys';
 // Input Only
 export function renderKeyPressNode(props) {
   const { x, y, value, uuid, selected, inputs, isDown } = props;
-  console.log(props)
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
