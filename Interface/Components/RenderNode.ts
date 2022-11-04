@@ -6,6 +6,8 @@ import { renderDetectionPanel } from "./DetectionNode";
 import { renderAngleChangeNode } from "./AngleChangeNode";
 import { renderValueChangeNode } from "./ValueChangeNode";
 import { renderANDLogicNode } from "./ANDLogicNode";
+import { renderGreaterThanLogicNode } from "./GreaterThanLogicNode";
+import { renderLessThanLogicNode } from "./LessThanLogicNode";
 
 export default {
   marker: renderMarkerNode,
@@ -16,4 +18,6 @@ export default {
   'value-change': renderValueChangeNode,
   'angle-change': renderAngleChangeNode,
   AND: renderANDLogicNode,
+  'greater-than': renderGreaterThanLogicNode,
+  'less-than': renderLessThanLogicNode,
 };

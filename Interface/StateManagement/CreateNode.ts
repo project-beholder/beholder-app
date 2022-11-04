@@ -6,6 +6,8 @@ import { createDetectionPanel } from "../Components/DetectionNode";
 import { createAngleChangeNode } from "../Components/AngleChangeNode";
 import { createValueChangeNode } from "../Components/ValueChangeNode";
 import { createANDLogicNode } from "../Components/ANDLogicNode";
+import { createGreaterThanLogicNode } from "../Components/GreaterThanLogicNode";
+import { createLessThanLogicNode } from "../Components/LessThanLogicNode";
 
 export default {
   marker: createMarkerNode,
@@ -16,4 +18,6 @@ export default {
   'value-change': createValueChangeNode,
   'angle-change': createAngleChangeNode,
   AND: createANDLogicNode,
+  'greater-than': createGreaterThanLogicNode,
+  'less-than': createLessThanLogicNode,
 };

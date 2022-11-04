@@ -142,7 +142,28 @@ function updateNode(node, input, field) {
       node[field] = input;
       node.wasTrue = (node.A && node.B);
       
-      // // add value to running tab
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'greater-than':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A > node.B);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'less-than':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A < node.B);
+      
       // console.log(node, input, field);
       // pass trigger state to all children
       R.toPairs(node.outputs).forEach(([key, out]) => {
