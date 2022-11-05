@@ -9,10 +9,10 @@ navigator.mediaDevices.enumerateDevices().then(function (devices) {
 
 // this should only be updated every couple of frames probs, not every update
 // document.querySelector('#test-img').src = "../frame.png?" + new Date().getTime();
-export function renderDetectionPanel(props) {
+export function renderDetectionPanel(props, { panX, panY }) {
   const { uuid, selected, x, y, outputs } = props;
   return div('.draggable-node.detection-panel',
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    { style: { transform: `translate(${x + panX}px, ${y + panY}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.detection-view', 'hide-me peter'), // position this absolute, kthanks
       img('.detection-img', { attrs: { src: '../frame.jpg' } }),

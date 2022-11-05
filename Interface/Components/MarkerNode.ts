@@ -3,13 +3,13 @@ import { div, span } from '@cycle/dom';
 
 import generateArucoMarkerGraphic from '../MarkerGraphic/GenMarker';
 
-export function renderMarkerNode(props, markers) { 
+export function renderMarkerNode(props, { panX, panY }, markers) { 
   const { x, y, ID, uuid, selected, inputs, outputs } = props;
   const marker = markers[ID];
 
   return div(
     `#${uuid}.draggable-node.marker-node`,
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    { style: { transform: `translate(${x + panX}px, ${y + panY}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
         ([key, { offsetX, offsetY, source, valueType }]) =>

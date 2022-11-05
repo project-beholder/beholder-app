@@ -3,12 +3,12 @@ import { div, span, select, option } from '@cycle/dom';
 
 import { KEY_MAPPINGS } from '../Constants/Keys';
 
-export function renderKeyTapNode(props) {
+export function renderKeyTapNode(props, { panX, panY }) {
   const { x, y, value, uuid, selected, inputs, isDown } = props;
 
   return div(
     `#${uuid}.draggable-node.dark-node.key-node`,
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { isDown, selected },  dataset: { uuid } },
+    { style: { transform: `translate(${x + panX}px, ${y + panY}px)` }, class: { isDown, selected },  dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
         ([key, { offsetX, offsetY, source }]) =>

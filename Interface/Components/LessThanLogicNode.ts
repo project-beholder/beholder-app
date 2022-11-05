@@ -1,12 +1,12 @@
 import * as R from 'ramda';
 import { div, span } from '@cycle/dom';
 
-export function renderLessThanLogicNode(props) { 
+export function renderLessThanLogicNode(props, { panX, panY }) { 
   const { x, y, uuid, selected, inputs, outputs } = props;
 
   return div(
     `#${uuid}.draggable-node.logic-node`,
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    { style: { transform: `translate(${x + panX}px, ${y + panY}px)` }, class: { selected }, dataset: { uuid } },
     [
       div('.node-inputs', R.toPairs(inputs).map(
         ([key, { offsetX, offsetY, source, valueType }]) =>

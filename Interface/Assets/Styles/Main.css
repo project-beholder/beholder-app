@@ -215,6 +215,7 @@ body {
 }
 #save-button img {
   width: 100%;
+  user-select: none;
 }
 
 #load-button {
@@ -229,6 +230,28 @@ body {
 }
 #load-button img {
   width: 100%;
+  user-select: none;
 }
 
 #load-input { display: none; }
+
+#pan-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: transparent;
+  background: transparent;
+  cursor: grab;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+}
+
+#pan-overlay.show {
+  display: block;
+}
+
+#pan-overlay.grabbing {
+  cursor: grabbing;
+}

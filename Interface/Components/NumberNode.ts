@@ -2,12 +2,12 @@ import * as R from 'ramda';
 import { div, span, input } from '@cycle/dom';
 
 // Output Only
-export function renderNumberNode(props) {
+export function renderNumberNode(props, { panX, panY }) {
   const { x, y, uuid, selected, value, outputs } = props;
 
   return div(
     `#${uuid}.draggable-node.number-node`,
-    { style: { transform: `translate(${x}px, ${y}px)` }, class: { selected }, dataset: { uuid } },
+    { style: { transform: `translate(${x + panX}px, ${y + panY}px)` }, class: { selected }, dataset: { uuid } },
     [
       input(
         '.node-input.node-number-input.var-number-input',

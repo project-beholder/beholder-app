@@ -9,17 +9,17 @@ import renderNode from './Components/RenderNode';
 import CommandReducer from './StateManagement/CommandReducer';
 
 
-function renderConnections(nodes) {
+function renderConnections(nodes, { panX, panY }) {
   const lines = Object.values(nodes)
     .filter(R.has('outputs'))
     .map((n) => {
       return R.flatten(R.values(n.outputs) // to render I don't need them sorted
         .map((o) => o.targets.map((t) => {
           // console.log(o, t);
-          const x1 = n.x + o.offsetX;
-          const y1 = n.y + o.offsetY;
-          const x2 = nodes[t.uuid].x + nodes[t.uuid].inputs[t.field].offsetX;
-          const y2 = nodes[t.uuid].y + nodes[t.uuid].inputs[t.field].offsetY;
+          const x1 = n.x + o.offsetX + panX;
+          const y1 = n.y + o.offsetY + panY;
+          const x2 = nodes[t.uuid].x + nodes[t.uuid].inputs[t.field].offsetX + panX;
+          const y2 = nodes[t.uuid].y + nodes[t.uuid].inputs[t.field].offsetY + panY;
           // const curveX = x1 + 30; // x1 + (x2 - x1)/6;
 
           const cp = Math.max(Math.abs((x2 - x1) / 2), 50);
@@ -44,7 +44,7 @@ function renderConnections(nodes) {
 }
 
 function NodeManager(sources: any) {
-  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$, loadedNodes$ } = sources;
+  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$, loadedNodes$, panDrag$ } = sources;
 
   const nodeMouseDown$ = DOM.select('.draggable-node').events('mousedown')
     .map((ev: MouseEvent) => {
@@ -170,13 +170,13 @@ function NodeManager(sources: any) {
       return [nodes[evt.parent].outputs[evt.name], nodes[evt.parent]];
     });
   const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true), connectedInputPressed$.mapTo(true));
-  const previewLine$ = xs.combine(endpoint$, mousePos$, showPreviewLine$)
-      .map(([[data, heldNode], mouse, show]) => {
+  const previewLine$ = xs.combine(endpoint$, mousePos$, showPreviewLine$, panDrag$)
+      .map(([[data, heldNode], mouse, show, { panX, panY }]) => {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
 
-        const x1 = heldNode.x + offsetX;
-        const y1 = heldNode.y + offsetY;
+        const x1 = heldNode.x + offsetX + panX;
+        const y1 = heldNode.y + offsetY + panY;
         const x2 = mouse.x;
         const y2 = mouse.y;
         
@@ -208,21 +208,21 @@ function NodeManager(sources: any) {
   // this needs to be proxied and turned into a node update
   // lines should be rendered directly from nodes
   const createConnection$ = createLineDropped$.compose(sampleCombine(endpoint$, showPreviewLine$))
-      .filter(R.nth(2)).debug()
+      .filter(R.nth(2))
       .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
 
   const connectionInfo$ = xs.combine(endpoint$, mousePos$, showPreviewLine$).startWith([[{ valueType: '' }], '', false]);
-  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection, connectionInfo$)
-    .map(([nodes, previewLine, markerData, connectionInfo]) => {
-      const connectionLines = renderConnections(nodes);
+  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection, connectionInfo$, panDrag$)
+    .map(([nodes, previewLine, markerData, connectionInfo, pan]) => {
+      const connectionLines = renderConnections(nodes, pan);
       connectionLines.push(previewLine);
       const [[{ valueType }], _, isConnecting] = connectionInfo;
       // console.log(valueType, isConnecting);
 
       // do svg lines here from nodes data
       return div({ class: { isConnecting }, dataset: { connectingValueType: valueType } }, [
-        ...Object.values(nodes).map((n) => renderNode[n.type](n, markerData)), // render nodes
+        ...Object.values(nodes).map((n) => renderNode[n.type](n, pan, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });
