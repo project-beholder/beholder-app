@@ -8,6 +8,7 @@ import { renderValueChangeNode } from "./ValueChangeNode";
 import { renderANDLogicNode } from "./ANDLogicNode";
 import { renderGreaterThanLogicNode } from "./GreaterThanLogicNode";
 import { renderLessThanLogicNode } from "./LessThanLogicNode";
+import { renderNOTLogicNode } from "./NOTLogicNode";
 
 export default {
   marker: renderMarkerNode,
@@ -18,6 +19,7 @@ export default {
   'value-change': renderValueChangeNode,
   'angle-change': renderAngleChangeNode,
   AND: renderANDLogicNode,
+  NOT: renderNOTLogicNode,
   'greater-than': renderGreaterThanLogicNode,
   'less-than': renderLessThanLogicNode,
 };

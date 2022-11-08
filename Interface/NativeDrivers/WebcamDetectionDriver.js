@@ -50,7 +50,6 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
 
     if (detectFrameTime <= 0) {
       detectFrameTime = 1000 / 45; // Detection FPS HERE
-
       detectThread.stdin.cork();
       detectThread.stdin.write(`001${shouldFlip}\r\n`);
       detectThread.stdin.uncork();
