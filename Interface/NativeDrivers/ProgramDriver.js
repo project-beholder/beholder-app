@@ -210,7 +210,7 @@ function updateNode(node, input, field) {
       node[field] = input;
       node.totalDt += dt;
       if (!node.ACTIVE) node.isOn = false;
-      if (node.totalDt >= node.PERIOD && node.ACTIVE) {
+      if (node.totalDt >= node.PERIOD / 2 && node.ACTIVE) {
         node.totalDt = 0;
         node.isOn = !node.isOn;
       }

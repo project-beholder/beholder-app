@@ -277,6 +277,11 @@ span.logic-node-text {
   border-color: transparent;
 }
 
+.between-node {
+  width: var(--logic-node-w);
+  height: calc(var(--logic-node-h) + 20px);
+}
+
 /* .key-node::after {
   position: absolute;
   top: 3px;
