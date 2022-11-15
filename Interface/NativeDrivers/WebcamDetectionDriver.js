@@ -80,7 +80,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
         });
 
         markers.forEach((m) => m.updatePresence(dt));
-        runProgram(markers);
+        runProgram(markers, dt);
         listener.next(markers);
       }
 

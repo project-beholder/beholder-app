@@ -9,6 +9,9 @@ import { renderANDLogicNode } from "./ANDLogicNode";
 import { renderGreaterThanLogicNode } from "./GreaterThanLogicNode";
 import { renderLessThanLogicNode } from "./LessThanLogicNode";
 import { renderNOTLogicNode } from "./NOTLogicNode";
+import { renderORLogicNode } from "./ORLogicNode";
+import { renderBetweenLogicNode } from "./BetweenLogicNode";
+import { renderPeriodicNode } from "./PeriodicNode";
 
 export default {
   marker: renderMarkerNode,
@@ -18,8 +21,11 @@ export default {
   detection: renderDetectionPanel,
   'value-change': renderValueChangeNode,
   'angle-change': renderAngleChangeNode,
+  between: renderBetweenLogicNode,
   AND: renderANDLogicNode,
   NOT: renderNOTLogicNode,
+  OR: renderORLogicNode,
   'greater-than': renderGreaterThanLogicNode,
   'less-than': renderLessThanLogicNode,
+  periodic: renderPeriodicNode,
 };

@@ -9,6 +9,9 @@ import { createANDLogicNode } from "../Components/ANDLogicNode";
 import { createGreaterThanLogicNode } from "../Components/GreaterThanLogicNode";
 import { createLessThanLogicNode } from "../Components/LessThanLogicNode";
 import { createNOTLogicNode } from "../Components/NOTLogicNode";
+import { createORLogicNode } from "../Components/ORLogicNode";
+import { createBetweenLogicNode } from "../Components/BetweenLogicNode";
+import { createPeriodicNode } from "../Components/PeriodicNode";
 
 export default {
   marker: createMarkerNode,
@@ -18,8 +21,11 @@ export default {
   detection: createDetectionPanel,
   'value-change': createValueChangeNode,
   'angle-change': createAngleChangeNode,
+  between: createBetweenLogicNode,
   AND: createANDLogicNode,
   NOT: createNOTLogicNode,
+  OR: createORLogicNode,
   'greater-than': createGreaterThanLogicNode,
   'less-than': createLessThanLogicNode,
+  periodic: createPeriodicNode,
 };

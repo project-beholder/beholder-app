@@ -9,6 +9,9 @@ else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 let keyThread;
 let shouldRun = false;
 
+// hack for periodic :()
+let dt = 0;
+
 function pressKey(key) {
   const hex = getKeyCode(key);
   keyThread.stdin.cork();
@@ -159,6 +162,17 @@ function updateNode(node, input, field) {
         out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
       });
       break;
+    case 'OR':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A || node.B);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
     case 'greater-than':
       // expected fields are A and B
       node[field] = input;
@@ -181,12 +195,37 @@ function updateNode(node, input, field) {
         out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
       });
       break;
+    case 'between':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A < node.X && node.X < node.B);
+      console.log(node.A, node.X, node.B);
+      
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'periodic':
+      node[field] = input;
+      node.totalDt += dt;
+      if (!node.ACTIVE) node.isOn = false;
+      if (node.totalDt >= node.PERIOD && node.ACTIVE) {
+        node.totalDt = 0;
+        node.isOn = !node.isOn;
+      }
+
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.isOn, t.field));
+      });
+      break;
       
     default: break;
   }
 }
 
-function runProgram(markerData) {
+function runProgram(markerData, deltaTime) {
+  dt = deltaTime;
   if (!shouldRun) {
     // make sure nodes aren't showing trigger
     Object.values(programGraph)

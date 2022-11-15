@@ -23,10 +23,13 @@ function view(display$, position$) {
         div('.palette-category', ['LOGIC', ul([
           button('.create-button', { dataset: { type: 'NOT' } }, 'NOT Gate'),
           button('.create-button', { dataset: { type: 'AND' } }, 'AND Gate'),
+          button('.create-button', { dataset: { type: 'OR' } }, 'OR Gate'),
           button('.create-button', { dataset: { type: 'greater-than' } }, 'Greater Than Gate'),
           button('.create-button', { dataset: { type: 'less-than' } }, 'Less Than Gate'),
+          button('.create-button', { dataset: { type: 'between' } }, 'Between Gate'),
           button('.create-button', { dataset: { type: 'value-change' } }, 'Value Change Trigger'),
           button('.create-button', { dataset: { type: 'angle-change' } }, 'Angle Change Trigger'),
+          button('.create-button', { dataset: { type: 'periodic' } }, 'Periodic'),
         ])]),
         div('.palette-category', ['KEYS', ul([
           button('.create-button', { dataset: { type: 'key-press' } }, 'Press Key'),
