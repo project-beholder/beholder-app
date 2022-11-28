@@ -141,7 +141,6 @@ export default function CommandReducer(oldNodes, action) {
         const hasMarkerChild = R.any(R.propEq('type', 'marker'), nodes[action.uuid].outputs.value.targets.map((t) => nodes[t.uuid]));
 
         // hack to prevent silly number nonsense
-        action.newValue = parseInt(action.newValue);
         if (R.type(action.newValue) !== 'Number' || (action.newValue < 0 && hasMarkerChild)) {
           // console.log(.value);
           action.newValue = 0;
