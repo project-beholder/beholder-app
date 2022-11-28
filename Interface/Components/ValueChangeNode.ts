@@ -27,7 +27,7 @@ export function createValueChangeNode(props, uuid) {
     THRESHOLD: 1000,
     totalDelta: 0,
     lastValue: 0, 
-    outputs: { TRIGGER: { noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
+    outputs: { TRIGGER: { name: 'TRIGGER', noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
     inputs: {
       VALUE: { offsetX: 0, offsetY: 29, source: null, sourceField: null, valueType: 'number' },
       THRESHOLD: { offsetX: 0, offsetY: 49, source: null, sourceField: null, valueType: 'number' },
