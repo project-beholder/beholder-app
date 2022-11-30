@@ -32,7 +32,7 @@ export function createKeyTapNode(props, uuid) {
     value: 'a',
     isDown: false,
     uuid,
-    inputs: { TAP: { offsetX: 0, offsetY: 39, source: null, sourceField: null, valueType: 'bool' } },
+    inputs: { TAP: { name: 'TAP', offsetX: 0, offsetY: 39, source: null, sourceField: null, valueType: 'bool' } },
     selected: false,
   };
 }

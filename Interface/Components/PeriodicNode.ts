@@ -27,7 +27,7 @@ export function createPeriodicNode(props, uuid) {
     PERIOD: 1000,
     totalDt: 0,
     isOn: false,
-    outputs: { TRIGGER: { noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
+    outputs: { TRIGGER: { name: 'TRIGGER', noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
     inputs: {
       ACTIVE: { offsetX: 0, offsetY: 29, source: null, sourceField: null, valueType: 'bool' },
       PERIOD: { offsetX: 0, offsetY: 49, source: null, sourceField: null, valueType: 'number' },

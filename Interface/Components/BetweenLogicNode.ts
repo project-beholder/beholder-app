@@ -29,7 +29,7 @@ export function createBetweenLogicNode(props, uuid) {
     B: 100, // current b value
     X: 0,
     wasTrue: false, 
-    outputs: { TRIGGER: { noText: true, offsetX: 220, offsetY: 69, targets: [], valueType: 'bool' }},
+    outputs: { TRIGGER: { name: 'TRIGGER', noText: true, offsetX: 220, offsetY: 69, targets: [], valueType: 'bool' }},
     inputs: {
       A: { offsetX: 0, offsetY: 29, source: null, sourceField: null, valueType: 'number' },
       X: { offsetX: 0, offsetY: 49, source: null, sourceField: null, valueType: 'number' },

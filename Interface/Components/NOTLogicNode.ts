@@ -28,7 +28,7 @@ export function createNOTLogicNode(props, uuid) {
     A: false, // current a value
     B: false, // current b value
     wasTrue: false, 
-    outputs: { TRIGGER: { noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
+    outputs: { TRIGGER: { name: 'TRIGGER', noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
     inputs: {
       value: { offsetX: 0, offsetY: 49, source: null, sourceField: null, valueType: 'bool' },
     },

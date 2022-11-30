@@ -29,7 +29,7 @@ export function createKeyPressNode(props, uuid) {
     value: 'a',
     isDown: false,
     uuid,
-    inputs: { PRESS: { offsetX: 0, offsetY: 39, source: null, sourceField: null, valueType: 'bool' } },
+    inputs: { PRESS: { name: 'PRESS', offsetX: 0, offsetY: 39, source: null, sourceField: null, valueType: 'bool' } },
     selected: false,
   };
 }

@@ -140,8 +140,10 @@ export default function CommandReducer(oldNodes, action) {
       if (nodes[action.uuid].type === 'number') {
         const hasMarkerChild = R.any(R.propEq('type', 'marker'), nodes[action.uuid].outputs.value.targets.map((t) => nodes[t.uuid]));
 
+        action.newValue = parseInt(action.newValue);
+
         // hack to prevent silly number nonsense
-        if (R.type(action.newValue) !== 'Number' || (action.newValue < 0 && hasMarkerChild)) {
+        if (isNaN(action.newValue) || (action.newValue < 0 && hasMarkerChild)) {
           // console.log(.value);
           action.newValue = 0;
           document.getElementById(action.uuid).querySelector('input').value = action.newValue;
@@ -149,7 +151,7 @@ export default function CommandReducer(oldNodes, action) {
         }
 
         nodes[action.uuid].outputs.value.targets.forEach((t) => {
-          nodes[t.uuid][t.field] = parseInt(action.newValue);
+          nodes[t.uuid][t.field] = action.newValue;
         });
       }
 

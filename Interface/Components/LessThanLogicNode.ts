@@ -28,7 +28,7 @@ export function createLessThanLogicNode(props, uuid) {
     A: 0, // current a value
     B: 100, // current b value
     wasTrue: false, 
-    outputs: { TRIGGER: { noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
+    outputs: { TRIGGER: { name: 'TRIGGER', noText: true, offsetX: 220, offsetY: 49, targets: [], valueType: 'bool' }},
     inputs: {
       A: { offsetX: 0, offsetY: 29, source: null, sourceField: null, valueType: 'number' },
       B: { offsetX: 0, offsetY: 49, source: null, sourceField: null, valueType: 'number' },

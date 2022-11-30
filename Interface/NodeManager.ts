@@ -136,10 +136,11 @@ function NodeManager(sources: any) {
     });
   const nodeValueChange$ = DOM.select('.node-input')
     .events('change')
-    .map((e) => {
-        const num = parseInt(e.target.value);
-        return ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: isNaN(num) ? 0 : num })
-    });
+    .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: e.target.value }));
+    // .map((e) => {
+    //     const num = parseInt(e.target.value);
+    //     return ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: isNaN(num) ? 0 : num })
+    // });
 
   // pause key emulation on most commands except move
   const stopEmulation$ = xs.merge(create$, connectProxy$, undo$, redo$, deleteCommand$, nodeValueChange$, removeConnection$)
