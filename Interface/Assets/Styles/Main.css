@@ -1,5 +1,69 @@
-#ip-address {
-  display: none;
+:root {
+  --gray-mid: #777777;
+  --gray-dark: #222222;
+  --gray-light: #F0F0F0;
+
+  --node-padding-horizontal: 15px;
+  --node-padding-vertical: 15px;
+
+  --io-height: 20px;
+  --io-point-diameter: 12px;
+
+  --marker-node-w: 280px;
+  --marker-node-h: 120px;
+
+  --number-node-w: 120px;
+  --number-node-h: 60px;
+
+  --detection-node-w: 350px;
+  --detection-node-h: 320px;
+
+  --logic-node-w: 220px;
+  --logic-node-h: 70px;
+
+  --send-node-w: 150px;
+  --send-node-h: 60px;
+
+  --node-z: 10;
+  --node-feedback-z: 11;
+
+  /* Palette: https://coolors.co/palette/e63c78-ffd264-00c896-0082be-82508c */
+  --main-green-color:#00AA66;
+  --main-pink-color: #e63c78;
+  --play-color: var(--main-green-color);
+  --stop-color: #CC2222;
+  --illegal-color: #BBBBBB;
+
+  --background-color: #ddd;
+  --background-tile-size: 20px;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 200;
+  src: url(fonts/Inter-Light.ttf);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url(fonts/Inter-Regular.ttf);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  src: url(fonts/Inter-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  src: url(fonts/Inter-ExtraBold.ttf);
 }
 
 html {
@@ -17,12 +81,21 @@ html {
 
 body {
   overflow: hidden;
+  /* background-size: 25px 25px;
+  background-image: linear-gradient(to right, white 40%, transparent 40%, transparent 60%, white 60%),
+    linear-gradient(to bottom, white 40%, transparent 40%, transparent 60%, white 60%),
+    linear-gradient(to right, transparent 48%, lightgrey 48%, lightgrey 52%, transparent 52%),
+    linear-gradient(to bottom, transparent 48%, lightgrey 48%, lightgrey 52%, transparent 52%); */
+  background: white;
+  background-image: radial-gradient(var(--background-color) 1px, transparent 0);
+  background-size: var(--background-tile-size) var(--background-tile-size);
+  background-position: calc(var(--background-tile-size) / 2 - 1px) calc(var(--background-tile-size) / 2 - 1px);
 }
 
 #cycle-root {
   width: 100vw;
   height: 100vh;
-  background-color: white;
+  /* background-color: white; */
 }
 
 #node-manager {
@@ -61,7 +134,7 @@ body {
 }
 
 .connection-path {
-  stroke:#000;
+  stroke:black;
   stroke-width: 5px;
   /* stroke-width:2;
   stroke-dasharray: 5; */
@@ -103,4 +176,82 @@ body {
   position: absolute;
   bottom: 0;
   left: 0;
+}
+
+#run-button {
+  position: absolute;
+  right: 50px;
+  top: 40px;
+  border-color: transparent;
+  border-radius: 75px;
+  z-index: 1000;
+  width: 70px;
+  height: 70px;
+  background-color: var(--play-color);
+  box-shadow: -3px 3px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+#run-button svg polygon {
+  fill: #fff;
+  stroke-linejoin: round;
+  stroke-width: 5;
+  stroke: #fff;
+}
+
+#run-button.running {
+  background-color: var(--stop-color);
+}
+
+#save-button {
+  position: absolute;
+  right: 110px;
+  bottom: 50px;
+  width: 40px;
+  height: 40px;
+  z-index: 100;
+  cursor: pointer;
+  
+}
+#save-button img {
+  width: 100%;
+  user-select: none;
+}
+
+#load-button {
+  position: absolute;
+  right: 50px;
+  bottom: 50px;
+  width: 40px;
+  height: 40px;
+  z-index: 100;
+  cursor: pointer;
+  
+}
+#load-button img {
+  width: 100%;
+  user-select: none;
+}
+
+#load-input { display: none; }
+
+#pan-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: transparent;
+  background: transparent;
+  cursor: grab;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+}
+
+#pan-overlay.show {
+  display: block;
+}
+
+#pan-overlay.grabbing {
+  cursor: grabbing;
 }

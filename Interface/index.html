@@ -12,9 +12,21 @@
   </head>
   <body>
     <section id="main-app"></section>
+    <script>
+      const ELECTRON_ENV = 'DEV';
+      // WHEN BUILDING, use this one vvv otherwise DEV ^^^ 
+      // const ELECTRON_ENV = 'PROD';
+
+      const { spawn, exec } = require('node:child_process');
+      const process = require('node:process');
+      const R = require('ramda');
+      const path = require('path');
+      // const Vec2 = require('./Utils/Vec2.js');
+      const xs = require('xstream').default;
+      const IS_MAC_PROD = (ELECTRON_ENV == 'PROD' && process.platform == 'darwin');
+    </script>
     <script src="./NativeDrivers/ProgramDriver.js"></script>
     <script src="./NativeDrivers/WebcamDetectionDriver.js"></script>
-    <script src="../dist/bundle.js"></script>
-    
+    <script src="../build/bundle.js"></script>
   </body>
 </html>

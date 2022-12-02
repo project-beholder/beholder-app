@@ -8,25 +8,24 @@ import sampleCombine from 'xstream/extra/sampleCombine';
 import renderNode from './Components/RenderNode';
 import CommandReducer from './StateManagement/CommandReducer';
 
-// TODO: Move this to another file
-function renderConnections(nodes) {
+
+function renderConnections(nodes, { panX, panY }) {
   const lines = Object.values(nodes)
-    .filter(R.has('output'))
+    .filter(R.has('outputs'))
     .map((n) => {
-      return n.output // to render I don't need them sorted
-        .map((o) => {
-          const x1 = n.x + o.offsetX;
-          const y1 = n.y + o.offsetY;
-          const x2 = nodes[o.target.parent].x + o.target.offsetX;
-          const y2 = nodes[o.target.parent].y + o.target.offsetY;
+      return R.flatten(R.values(n.outputs) // to render I don't need them sorted
+        .map((o) => o.targets.map((t) => {
+          // console.log(o, t);
+          const x1 = n.x + o.offsetX + panX;
+          const y1 = n.y + o.offsetY + panY;
+          const x2 = nodes[t.uuid].x + nodes[t.uuid].inputs[t.field].offsetX + panX;
+          const y2 = nodes[t.uuid].y + nodes[t.uuid].inputs[t.field].offsetY + panY;
           // const curveX = x1 + 30; // x1 + (x2 - x1)/6;
 
           const cp = Math.max(Math.abs((x2 - x1) / 2), 50);
 
           const midX1 = x1 + cp;
           const midX2 = x2 - cp;
-
-          // const midY = y1 + (y2 - y1)/2;
 
           // <path d="M 50 50 Q 100 50, 100 100 T 150 150" stroke="black" fill="transparent"/>
           // lets make a curve!
@@ -38,13 +37,14 @@ function renderConnections(nodes) {
                 fill: 'transparent',
               }
             });
-        });
+        })));
     });
+    // console.log(lines);
   return R.flatten(lines);
 }
 
 function NodeManager(sources: any) {
-  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$ } = sources;
+  const { DOM, WebcamDetection, mouseUp$, globalMouseDown$, globalKeyDown$, create$, mousePos$, loadedNodes$, panDrag$ } = sources;
 
   const nodeMouseDown$ = DOM.select('.draggable-node').events('mousedown')
     .map((ev: MouseEvent) => {
@@ -105,12 +105,46 @@ function NodeManager(sources: any) {
     .map(([pos, held]) => ({ command: 'move', ...pos }));
   
   const connectProxy$ = xs.create();
+  const outputPressed$ = DOM.select('.output-point').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev.target.dataset;
+    });
+  const createLineDropped$ = DOM.select('.input-point').events('mouseup')
+    .filter((ev: MouseEvent) => !ev.target.classList.contains('connected'))
+    .map((ev: MouseEvent) => ev.target.dataset);
+  const connectedInputPressed$ = DOM.select('.input-point.connected').events('mousedown')
+    .map((ev: MouseEvent) => {
+      ev.stopPropagation();
+      return ev.target.dataset;
+    });
+
+  const removeConnection$ = connectedInputPressed$.map((data) => ({
+    command: 'remove-connection',
+    uuid: data.parent,
+    name: data.name,
+  }));
 
   // Individual node events here
   // is there a way to make this more generic? probably in dataset
+  // prevent input nonsense
+  DOM.select('.node-number-input').events('keydown')
+    .subscribe({
+      next: (e) => {
+        if (e.key == 'Backspace') e.stopPropagation();
+      }
+    });
   const nodeValueChange$ = DOM.select('.node-input')
     .events('change')
     .map((e) => ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: e.target.value }));
+    // .map((e) => {
+    //     const num = parseInt(e.target.value);
+    //     return ({ command: 'value-change', uuid: e.target.dataset.uuid, prop: 'value', newValue: isNaN(num) ? 0 : num })
+    // });
+
+  // pause key emulation on most commands except move
+  const stopEmulation$ = xs.merge(create$, connectProxy$, undo$, redo$, deleteCommand$, nodeValueChange$, removeConnection$)
+    .mapTo(false);
 
   // generate node objects from all of the elements
   // move this to a function + file
@@ -122,27 +156,31 @@ function NodeManager(sources: any) {
       redo$,
       deleteCommand$,
       selectCommand$,
-      nodeValueChange$, // replace when more of this command type come in to play, ie number
+      nodeValueChange$,
+      loadedNodes$.map(l => ({ command: 'load', newNodes: l })),
+      removeConnection$, // replace when more of this command type come in to play, ie number
     )
     .fold(CommandReducer, {}).remember();
-  
-  const outputPressed$ = DOM.select('.output-point').events('mousedown')
-    .map((ev: MouseEvent) => {
-      ev.stopPropagation();
-      return ev.target.dataset;
-    });
-  const createLineDropped$ = DOM.select('.input-point').events('mouseup').map((ev: MouseEvent) => ev.target.dataset);
 
   // needs to hide on mouse up and when a connection is made, but show when an output is clicked
-  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true));
-  const previewLine$ = xs.combine(outputPressed$, mousePos$, nodes$, showPreviewLine$)
-      .map(([data, mouse, nodes, show]) => {
+  const endpoint$ = xs.merge(outputPressed$, connectedInputPressed$)
+    .compose(sampleCombine(nodes$))
+    .map(([evt, nodes]) => {
+
+      if (evt.type === 'input') {
+        const input = nodes[evt.parent].inputs[evt.name];
+        return [nodes[input.source].outputs[input.sourceField], nodes[input.source]];
+      }
+      return [nodes[evt.parent].outputs[evt.name], nodes[evt.parent]];
+    });
+  const showPreviewLine$ = xs.merge(mouseUp$.mapTo(false), connectProxy$.mapTo(false), outputPressed$.mapTo(true), connectedInputPressed$.mapTo(true));
+  const previewLine$ = xs.combine(endpoint$, mousePos$, showPreviewLine$, panDrag$)
+      .map(([[data, heldNode], mouse, show, { panX, panY }]) => {
         const offsetX = parseFloat(data.offsetX);
         const offsetY = parseFloat(data.offsetY);
-        const heldNode = nodes[data.parent];
 
-        const x1 = heldNode.x + offsetX;
-        const y1 = heldNode.y + offsetY;
+        const x1 = heldNode.x + offsetX + panX;
+        const y1 = heldNode.y + offsetY + panY;
         const x2 = mouse.x;
         const y2 = mouse.y;
         
@@ -173,19 +211,22 @@ function NodeManager(sources: any) {
   
   // this needs to be proxied and turned into a node update
   // lines should be rendered directly from nodes
-  const createConnection$ = createLineDropped$.compose(sampleCombine(outputPressed$, showPreviewLine$))
+  const createConnection$ = createLineDropped$.compose(sampleCombine(endpoint$, showPreviewLine$))
       .filter(R.nth(2))
-      .map(([start, end]) => ({ command: 'connect', props: { start, end } }))
+      .map(([input, output]) => ({ command: 'connect', props: { input, output } }))
   connectProxy$.imitate(createConnection$);// proxy this so we can do our cyclical deps
-  
-  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection)
-    .map(([nodes, previewLine, markerData]) => {
-      const connectionLines = renderConnections(nodes);
+
+  const connectionInfo$ = xs.combine(endpoint$, mousePos$, showPreviewLine$).startWith([[{ valueType: '' }], '', false]);
+  const vdom$ = xs.combine(nodes$, previewLine$, WebcamDetection, connectionInfo$, panDrag$)
+    .map(([nodes, previewLine, markerData, connectionInfo, pan]) => {
+      const connectionLines = renderConnections(nodes, pan);
       connectionLines.push(previewLine);
+      const [[{ valueType }], _, isConnecting] = connectionInfo;
+      // console.log(valueType, isConnecting);
 
       // do svg lines here from nodes data
-      return div([
-        ...Object.values(nodes).map((n) => renderNode(n, markerData)), // render nodes
+      return div({ class: { isConnecting }, dataset: { connectingValueType: valueType } }, [
+        ...Object.values(nodes).map((n) => renderNode[n.type](n, pan, markerData)), // render nodes
         svg('#connection-lines', connectionLines)
       ]);
     });
@@ -197,6 +238,7 @@ function NodeManager(sources: any) {
     DOM: vdom$,
     capturedClicks$,
     nodes$,
+    stopEmulation$, 
   }
   return sinks;
 }

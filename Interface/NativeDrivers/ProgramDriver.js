@@ -1,15 +1,16 @@
-const { spawn, exec } = require('node:child_process');
-const process = require('node:process');
-const R = require('ramda');
-// const Vec2 = require('./Utils/Vec2.js');
-const xs = require('xstream').default;
-
+// console.log(path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`));
+let keyEmulationPath = `./Native/KeyboardEmulation/build/keyboardEmulation${process.platform == 'win32' ? '.exe' : ''}`;
+if (IS_MAC_PROD) keyEmulationPath = path.join(__dirname, '../../../Native/KeyboardEmulation/build/keyboardEmulation');
 
 let getKeyCode;
 if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
 else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 
 let keyThread;
+let shouldRun = false;
+
+// hack for periodic :()
+let dt = 0;
 
 function pressKey(key) {
   const hex = getKeyCode(key);
@@ -26,8 +27,8 @@ function releaseKey(key) {
 }
 
 function initKeyboard() {
-  if (process.platform === 'win32') keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation.exe');
-  else keyThread = spawn('./Native/KeyboardEmulation/build/keyboardEmulation');
+  keyThread = spawn(keyEmulationPath);
+  window.addEventListener("beforeunload", () => { keyThread.kill() });
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
       // console.log(`stdout keyboard: ${rawData}`);
@@ -38,14 +39,14 @@ function initKeyboard() {
   process.on('SIGINT', () => { process.exit(0); });
   process.on('SIGTERM', () => { process.exit(0); });
   process.on('exit', () => {
-      console.log('Killing child process');
+      console.log('Killing thread child process');
       keyThread.kill();
   });
 }
 
 
 let programGraph = {}
-function updateNode(node, input) {
+function updateNode(node, input, field) {
   let trigger = false;
   switch (node.type) {
     case 'key-press':
@@ -78,8 +79,8 @@ function updateNode(node, input) {
       // set node properties for rendering
 
       // this could possibly change when displaying data live feed
-      node.output.forEach((out) => {
-        updateNode(programGraph[out.target.parent], input[node.ID][out.field]);
+      R.values(node.outputs).forEach((out) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], input[node.ID][out.property], t.field));
       });
       break;
     case 'value-change':
@@ -88,24 +89,27 @@ function updateNode(node, input) {
       node.lastValue = input;
 
       // if threshold is exceeded, reset to zero and pass true to all children
-      if (node.threshold >= 0) {
-        if (node.totalDelta >= node.threshold) {
+      if (node.THRESHOLD >= 0) {
+        if (node.totalDelta >= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
         // need to clamp at zero
-        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+        node.totalDelta = R.clamp(0, node.THRESHOLD, node.totalDelta);
       } else {
-        if (node.totalDelta <= node.threshold) {
+        if (node.totalDelta <= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
 
-        node.totalDelta = R.clamp(node.threshold, 0, node.totalDelta);
+        node.totalDelta = R.clamp(node.THRESHOLD, 0, node.totalDelta);
       }
 
       // pass trigger state to all children
-      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      // this could possibly change when displaying data live feed
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger, t.field));
+      });
       break;
     case 'angle-change':
       // add value to running tab
@@ -115,15 +119,15 @@ function updateNode(node, input) {
       node.lastValue = input;
 
       // if threshold is exceeded, reset to zero and pass true to all children
-      if (node.threshold >= 0) {
-        if (node.totalDelta >= node.threshold) {
+      if (node.THRESHOLD >= 0) {
+        if (node.totalDelta >= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
         // need to clamp at zero
-        node.totalDelta = R.clamp(0, node.threshold, node.totalDelta);
+        node.totalDelta = R.clamp(0, node.THRESHOLD, node.totalDelta);
       } else {
-        if (node.totalDelta <= node.threshold) {
+        if (node.totalDelta <= node.THRESHOLD) {
           trigger = true;
           node.totalDelta = 0;
         }
@@ -132,31 +136,121 @@ function updateNode(node, input) {
       }
 
       // pass trigger state to all children
-      node.output.forEach((out) => updateNode(programGraph[out.target.parent], trigger));
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], trigger, t.field));
+      });
       break;
+    case 'AND':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A && node.B);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
       break;
+    case 'NOT':
+      // expected fields are A and B
+      node[field] = !input;
+      node.wasTrue = (node.value);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'OR':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A || node.B);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'greater-than':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A > node.B);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'less-than':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A < node.B);
+      
+      // console.log(node, input, field);
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'between':
+      // expected fields are A and B
+      node[field] = input;
+      node.wasTrue = (node.A < node.X && node.X < node.B);
+      console.log(node.A, node.X, node.B);
+      
+      // pass trigger state to all children
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.wasTrue, t.field));
+      });
+      break;
+    case 'periodic':
+      node[field] = input;
+      node.totalDt += dt;
+      if (!node.ACTIVE) node.isOn = false;
+      if (node.totalDt >= node.PERIOD / 2 && node.ACTIVE) {
+        node.totalDt = 0;
+        node.isOn = !node.isOn;
+      }
+
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], node.isOn, t.field));
+      });
+      break;
+      
     default: break;
   }
 }
 
-function runProgram(markerData) {
+function runProgram(markerData, deltaTime) {
+  dt = deltaTime;
+  if (!shouldRun) {
+    // make sure nodes aren't showing trigger
+    Object.values(programGraph)
+      .filter(R.propSatisfies(R.includes('key'), 'type'))
+      .forEach((n) => n.isDown = false);
+    return;
+  }
+
   Object.values(programGraph)
     .filter(R.propEq('type', 'detection'))
     .forEach((node) => {
-      // console.log(node);
-      node.output.forEach((out) => {
-        updateNode(programGraph[out.target.parent], markerData);
+
+      R.toPairs(node.outputs).forEach(([key, out]) => {
+        out.targets.forEach((t) => updateNode(programGraph[t.uuid], markerData));
       });
     });
 }
 
 function ProgramDriver(programGraph$) {
   initKeyboard();
-  // console.log(keyThread);
+
   programGraph$.subscribe({
-    next: (p) => {
-      // console.log('program set', p)
-      programGraph = R.clone(p)
+    next: ([p, run]) => {
+      shouldRun = run;
+      programGraph = p;
     },
   });
 

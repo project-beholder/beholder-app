@@ -1,6 +1,10 @@
-// const { spawn } = require('node:child_process');
 const Marker = require('./NativeDrivers/Utils/Marker.js');
 const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
+
+let detectExePath = `./Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`;
+if (IS_MAC_PROD) detectExePath = path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`);
+let detectImgPath = '../Native/LocalMarkerDetection/build/frame.jpg?';
+if (ELECTRON_ENV == 'PROD') detectImgPath = path.join(__dirname, '../../../Native/LocalMarkerDetection/build/frame.jpg?');
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
@@ -18,7 +22,6 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
       switch(type) {
         case 'camera-feed':
           detectThread.stdin.cork();
-          // console.log(value)
           detectThread.stdin.write(`10${value}0\r\n`);
           detectThread.stdin.uncork();
           break;
@@ -30,18 +33,15 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   })
 
   // detection thread init
-  let detectThread;
-  if (process.platform === 'win32') detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker.exe');
-  else detectThread = spawn('./Native/LocalMarkerDetection/build/detectMarker');
+  const detectThread = spawn(detectExePath);
   detectThread.stdin.setDefaultEncoding('utf-8');
+  window.addEventListener("beforeunload", () => { detectThread.kill() });
 
   let prevDetectTime = Date.now();
   let detectFrameTime = 0;
 
   // runs detection every frame for now
   const detectionLoop = () => {
-    requestAnimationFrame(detectionLoop);
-
     const currTime = Date.now();
     const dt = currTime - prevDetectTime;
     prevDetectTime = currTime;
@@ -50,10 +50,11 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
 
     if (detectFrameTime <= 0) {
       detectFrameTime = 1000 / 45; // Detection FPS HERE
-
       detectThread.stdin.cork();
       detectThread.stdin.write(`001${shouldFlip}\r\n`);
       detectThread.stdin.uncork();
+    } else {
+      requestAnimationFrame(detectionLoop);
     }
   }
 
@@ -79,18 +80,30 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
         });
 
         markers.forEach((m) => m.updatePresence(dt));
-        runProgram(markers);
+        runProgram(markers, dt);
         listener.next(markers);
       }
 
       detectThread.stdout.on('data', (rawData) => {
-        if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
+        // if (rawData.toString()[0] !== '{') return; // bail on nonsense messages
 
-        if (document.querySelector('.detection-img')) document.querySelector('.detection-img').src = `../frame.jpg?${Date.now()}`;
+        // sometimes the message is bad and doubled, we drop them for now
+        try {
+          const data = JSON.parse(rawData);
 
-        const data = JSON.parse(rawData);
-        if (data.markers) updateMarkers(data.markers);
-        
+          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `${detectImgPath}${Date.now()}`;
+          if (data.markers) {
+            updateMarkers(data.markers);
+            requestAnimationFrame(detectionLoop);
+          }
+        } catch (error) {
+          // console.log(error, rawData.toString());
+          // THIS PROBABLY HAPPENED BC TWO MESSAGES AT THE SAME TIME
+          // below gets a new array, right now we just drop the frame
+          // const regex = /\n/g;
+          // console.log(rawData.toString().split(regex));
+          requestAnimationFrame(detectionLoop);
+        }
       });
 
       // start the detection parade
@@ -106,20 +119,3 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   const detection$ = xs.create(detectedProducer);
   return detection$;
 }
-
-// if we find the process is not killing it properly
-  // // Make sure to kill the child process on exit or mem leak
-  // process.on('SIGINT', () => {
-  //   console.log('Killing child process 1');
-  //   detectThread.kill();
-  //   process.exit(0);
-  // });
-  // process.on('SIGTERM', () => {
-  //   console.log('Killing child process 2');
-  //   detectThread.kill();
-  //   process.exit(0);
-  // });
-  // process.on('exit', () => {
-  //   console.log('Killing child process 3');
-  //   detectThread.kill();
-  // });

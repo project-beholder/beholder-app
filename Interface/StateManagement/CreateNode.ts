@@ -1,61 +1,31 @@
-export default function createNode(props, uuid) {
-  // Could replace this with an object that has functions for processing
-  switch(props.type) {
-    case 'marker':
-      return {
-        ...props,
-        ID: 0,
-        timeout: 100, // DEFAULT_MARKER_TIMEOUT
-        uuid,
-        output: [],
-        selected: false,
-      };
-    case 'key-press':
-      return {
-        ...props,
-        value: 'a',
-        isDown: false,
-        uuid,
-        input: [],
-        selected: false,
-      };
-    case 'key-tap':
-      return {
-        ...props,
-        value: 'a',
-        isDown: false,
-        uuid,
-        input: [],
-        selected: false,
-      };
-    case 'number':
-      return {
-        ...props,
-        value: 0,
-        uuid,
-        output: [],
-        selected: false,
-      };
-    case 'detection':
-      return {
-        ...props,
-        camID: 0,
-        uuid,
-        output: [],
-        selected: false,
-      };
-    case 'angle-change':
-    case 'value-change':
-      return {
-        ...props,
-        uuid,
-        value: 1,
-        threshold: 1000,
-        totalDelta: 0,
-        lastValue: 0, 
-        output: [],
-        selected: false,
-      };
-  }
-  return null; // this is an error friend
-}
+import { createMarkerNode } from "../Components/MarkerNode";
+import { createKeyPressNode } from "../Components/KeyPressNode";
+import { createKeyTapNode } from "../Components/KeyTapNode";
+import { createNumberNode } from "../Components/NumberNode";
+import { createDetectionPanel } from "../Components/DetectionNode";
+import { createAngleChangeNode } from "../Components/AngleChangeNode";
+import { createValueChangeNode } from "../Components/ValueChangeNode";
+import { createANDLogicNode } from "../Components/ANDLogicNode";
+import { createGreaterThanLogicNode } from "../Components/GreaterThanLogicNode";
+import { createLessThanLogicNode } from "../Components/LessThanLogicNode";
+import { createNOTLogicNode } from "../Components/NOTLogicNode";
+import { createORLogicNode } from "../Components/ORLogicNode";
+import { createBetweenLogicNode } from "../Components/BetweenLogicNode";
+import { createPeriodicNode } from "../Components/PeriodicNode";
+
+export default {
+  marker: createMarkerNode,
+  'key-press': createKeyPressNode,
+  'key-tap': createKeyTapNode,
+  number: createNumberNode,
+  detection: createDetectionPanel,
+  'value-change': createValueChangeNode,
+  'angle-change': createAngleChangeNode,
+  between: createBetweenLogicNode,
+  AND: createANDLogicNode,
+  NOT: createNOTLogicNode,
+  OR: createORLogicNode,
+  'greater-than': createGreaterThanLogicNode,
+  'less-than': createLessThanLogicNode,
+  periodic: createPeriodicNode,
+};
