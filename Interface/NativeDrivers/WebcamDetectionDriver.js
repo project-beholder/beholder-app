@@ -8,6 +8,7 @@ if (ELECTRON_ENV == 'PROD') detectImgPath = path.join(__dirname, '../../../Nativ
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
+console.log(detectExePath);
 function WebcamDetectionDriver(cameraFeedChanges$) {
   // Marker stuff
   const markers = [];
@@ -97,7 +98,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
             requestAnimationFrame(detectionLoop);
           }
         } catch (error) {
-          // console.log(error, rawData.toString());
+          console.log(error, rawData.toString());
           // THIS PROBABLY HAPPENED BC TWO MESSAGES AT THE SAME TIME
           // below gets a new array, right now we just drop the frame
           // const regex = /\n/g;
