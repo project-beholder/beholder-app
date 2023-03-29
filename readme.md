@@ -1,19 +1,21 @@
-# IGNORE ALL THIS FOR NOW
+# Beholder Basic Setup
+
+## Windows
+- Make sure [node.js](https://nodejs.org/en) is installed
+- Clone the repo and open a terminal at the root folder
+- Run `npm install`
+- Replace the `Native` folder with the correct Native C++ programs that have been shared with you
+- Run `npm run build`
+- Run `npm start` and the app should open
+- *If you have issues with the camera feed try terminating the app and restarting it. You can tell the app is loading properly if the green play button appears.*
+
+## When developing
+- Use the `npm run dev` command instead of the `build` command (this will automatically rebuild the JS when)
+- Then open a separate terminal window to run `npm start`
+
+
+
 
 ## Mac Lib info 
 https://developer.apple.com/documentation/coregraphics/1456564-cgeventcreatekeyboardevent
 apple key codes: https://eastmanreference.com/complete-list-of-applescript-key-codes 
-
-## dev
-`npm run build` or `npm run dev`
-`npm start`
-
-
-# Dataflow for Beholder App
-this file details the datastructures and flow through the application including the programming interface, keyboard emulation, and marker detection.
-
-## Core elements
-
-1. **Detection Source**: Provides a constant update of markers to the application.
-2. **Logic Graph**: A graph of nodes that parse the detected markers and can apply logic to them to script interactions.
-3. **Outputs**: Endpoints stored in the graph that output keyboard emulation or...
