@@ -15,7 +15,7 @@ export function renderMarkerNode(props, { panX, panY }, markers) {
         ([key, { offsetX, offsetY, source, valueType }]) =>
           span('.input-point', { class: { connected: !R.isNil(source) }, dataset: { type: 'input', valueType, name: key, parent: uuid, offsetX, offsetY } }, key)
       )),
-      generateArucoMarkerGraphic(ID), // only supports up to marker 9 :()
+      generateArucoMarkerGraphic(ID),
       div('.node-outputs', R.toPairs(outputs).map(
         ([key, { offsetX, offsetY, property, valueType }]) =>
           span('.output-point', { dataset: { type: 'output', name: key, parent: uuid, offsetX, offsetY, valueType } }, [key, span('.marker-data', marker[property].toString())])
