@@ -1,6 +1,1 @@
-**/build**
-node_modules
-dist
-bin
-**/**/.DS_Store
-frame.jpg
+/rust/target
