@@ -6,7 +6,8 @@ Currently we are still in early development of Beholder so we do not have any re
 
 ## Windows Instructions
 1. If you do not have it already install [node.js](https://nodejs.org/en).
-2. Install OpenCV, on Windows it is easiest to do this from the [OpenCV installer](https://opencv.org/releases/). *Make sure you add OpenCV to Path or Beholder will not work properly.*
+2. Install OpenCV version 4.7, on Windows it is easiest to do this from the [OpenCV installer](https://opencv.org/releases/). *Make sure you add OpenCV to Path or Beholder will not work properly.*
+    - A tutorial on how to set OpenCV environment variables can be be found (here)[https://www.tutorialspoint.com/how-to-install-opencv-for-cplusplus-in-windows] in the "Setting Environment Vairables" section.
 3. Clone this repository on to your computer and open a terminal at the root folder.
 4. Run `npm install` in the terminal to install all of the Javascript dependencies.
 5. Replace the `Native` folder in the code base with the [Windows Binaries Here](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/pegy8859_colorado_edu/EYBRymB2_sBGlkfNLS3GO0UB2dru28osh3_rWVrHQUybJA?e=JJ5ycQ).
@@ -15,7 +16,7 @@ Currently we are still in early development of Beholder so we do not have any re
 
 ## Mac Instructions
 1. If you do not have it already install [node.js](https://nodejs.org/en).
-2. Install OpenCV, on Mac it is easiest to do this through Homebrew.
+2. Install OpenCV version 4.7, on Mac it is easiest to do this through Homebrew.
     - To install Homebrew, follow the instructions on their [website](https://brew.sh/).
     - To install OpenCV, use the following command in the terminal `brew install opencv`.
 3. Clone this repository on to your computer and open a terminal at the root folder.
