@@ -23,11 +23,17 @@ fn main() {
 
     let now = Instant::now();
     loop {
+        let start_time = now.elapsed().as_millis();
         // Detect and update markers
         marker_detector.observation_loop();
+
+        let end_time = now.elapsed().as_millis();
+        println!("Loop time: {}", end_time-start_time);
+        
         let map = marker_detector.marker_map();
 
         tree.update(map);
+
 
         if now.elapsed().as_secs() > 10 { break; }
     }

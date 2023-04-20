@@ -56,6 +56,10 @@ pub fn create_marker_detector() -> MarkerDetector {
 impl MarkerDetector {
     pub fn observation_loop(&mut self) {
         self.cam.read(&mut self.frame).unwrap();
+        // let mut img = Mat::default();
+        // let s = core::Size::new(320, 240);
+        // opencv::imgproc::resize(&self.frame, &mut img, s, 0.0, 0.0, opencv::imgproc::INTER_LINEAR).unwrap();
+        // opencv::imgproc::resize(&self.frame, &mut img, core::Size(), 0.5, 0.5, INTER_LINEAR);
 
         // Detect markers
         let mut corners: VectorOfVectorOfPoint2f = VectorOfVectorOfPoint2f::new();
@@ -90,7 +94,7 @@ impl MarkerDetector {
 
             self.marker_map.insert(id, marker);
 
-            highgui::imshow("beholder", &self.frame).unwrap();
+            // highgui::imshow("beholder", &self.frame).unwrap();
         }
 
     } 
@@ -100,41 +104,41 @@ impl MarkerDetector {
     }
 }
 
-pub fn observation_loop() -> opencv::Result<()>{
-    highgui::named_window("beholder", highgui::WINDOW_FULLSCREEN)?;
+// pub fn observation_loop() -> opencv::Result<()>{
+//     highgui::named_window("beholder", highgui::WINDOW_FULLSCREEN)?;
 
-    let mut cam: videoio::VideoCapture = videoio::VideoCapture::new(0, videoio::CAP_ANY)?;
-    let mut frame: Mat = Mat::default();
+//     let mut cam: videoio::VideoCapture = videoio::VideoCapture::new(0, videoio::CAP_ANY)?;
+//     let mut frame: Mat = Mat::default();
 
-    // Set up ArUco
-    let dict = objdetect::get_predefined_dictionary(objdetect::PredefinedDictionaryType::DICT_4X4_100)?;
-    let param = objdetect::DetectorParameters::default()?;
-    let refine = objdetect::RefineParameters::new(10.0, 3.0, true)?;
+//     // Set up ArUco
+//     let dict = objdetect::get_predefined_dictionary(objdetect::PredefinedDictionaryType::DICT_4X4_100)?;
+//     let param = objdetect::DetectorParameters::default()?;
+//     let refine = objdetect::RefineParameters::new(10.0, 3.0, true)?;
 
-    let detector = objdetect::ArucoDetector::new(&dict, &param, refine)?;
+//     let detector = objdetect::ArucoDetector::new(&dict, &param, refine)?;
 
-    loop {
-        cam.read(&mut frame)?;
+//     loop {
+//         cam.read(&mut frame)?;
 
-        // Detect markers
-        let mut corners: VectorOfVectorOfPoint2f = VectorOfVectorOfPoint2f::new();
-        let mut rejected: VectorOfVectorOfPoint2f = VectorOfVectorOfPoint2f::new();
-        let mut ids: VectorOfi32 = VectorOfi32::new();
+//         // Detect markers
+//         let mut corners: VectorOfVectorOfPoint2f = VectorOfVectorOfPoint2f::new();
+//         let mut rejected: VectorOfVectorOfPoint2f = VectorOfVectorOfPoint2f::new();
+//         let mut ids: VectorOfi32 = VectorOfi32::new();
 
-        detector.detect_markers(&frame, &mut corners, &mut ids, &mut rejected)?;
+//         detector.detect_markers(&frame, &mut corners, &mut ids, &mut rejected)?;
 
-        if ids.len() > 0 {
-            let color: core::Scalar = core::Scalar::new(0.0, 0.0, 255.0, 0.0);
-            objdetect::draw_detected_markers(&mut frame, &corners, &ids, color)?;
-        }
+//         if ids.len() > 0 {
+//             let color: core::Scalar = core::Scalar::new(0.0, 0.0, 255.0, 0.0);
+//             objdetect::draw_detected_markers(&mut frame, &corners, &ids, color)?;
+//         }
 
-        highgui::imshow("beholder", &frame)?;
-        let key = highgui::wait_key(1)?;
-        if key == 113 {
-            break;
-        }
+//         highgui::imshow("beholder", &frame)?;
+//         let key = highgui::wait_key(1)?;
+//         if key == 113 {
+//             break;
+//         }
 
-    }
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }

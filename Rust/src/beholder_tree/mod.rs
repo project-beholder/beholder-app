@@ -43,14 +43,14 @@ impl BeholderTree {
     fn create_queue(&self, key: &String, queue: &mut Vec<String>) {
         match self.map.get(key).unwrap() {
             GeneralNode::Detect(node) => {
-                println!("[DetectionNode] {}", key);
+                // println!("[DetectionNode] {}", key);
                 queue.push(key.clone());
                 for out in &node.outputs {
                     self.create_queue(out, queue);
                 }
             },
             GeneralNode::Marker(node) => {
-                println!("[MarkerNode] {}", key);
+                // println!("[MarkerNode] {}", key);
                 queue.push(key.clone());
                 for out in &node.detect_outputs {
                     self.create_queue(out, queue);
@@ -66,7 +66,7 @@ impl BeholderTree {
                 }
             },
             GeneralNode::KeyPress(node) => {
-                println!("[KeyPressNode] {}", key);
+                // println!("[KeyPressNode] {}", key);
                 queue.push(key.clone());
             }
             _ => ()
@@ -80,11 +80,11 @@ impl BeholderTree {
                 match marker_map.get(&node.id) {
                     Some(marker) => {
                         node.update_marker(true, marker.x(), marker.y(), marker.angle());
-                        println!("[MarkerNode] Updated marker {:?}", marker );
+                        // println!("[MarkerNode] Updated marker {:?}", marker );
                     },
                     None => {
                         node.update_marker(false, node.pos_x, node.pos_y, node.angle);
-                        println!("[MarkerNode] Marker {} not present", node.id);
+                        // println!("[MarkerNode] Marker {} not present", node.id);
                     }
                 }
                 *prev_val = node.detect_value.clone();
@@ -92,11 +92,11 @@ impl BeholderTree {
             GeneralNode::KeyPress(node) => {
                 if (*prev_val) {
                     keyboard_emulation::press_key(&node.value);
-                    println!("[KeyPressNode] Pressed");
+                    // println!("[KeyPressNode] Pressed");
                 }
                 else {
                     keyboard_emulation::release_key(&node.value);
-                    println!("[KeyPressNode] Released");
+                    // println!("[KeyPressNode] Released");
                 }
             }
             _ => ()
