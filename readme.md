@@ -12,7 +12,6 @@ Currently we are still in early development of Beholder so we do not have any re
 5. Replace the `Native` folder in the code base with the [Windows Binaries Here](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/pegy8859_colorado_edu/EYBRymB2_sBGlkfNLS3GO0UB2dru28osh3_rWVrHQUybJA?e=JJ5ycQ).
 6. Run `npm run build` in the terminal to build the Javascript code base.
 7. Run `npm start` from the terminal and the app should open.
-- *If you have issues with the camera feed try terminating the app and restarting it. You can tell the app is loading properly if the green play button appears.*
 
 ## Mac Instructions
 1. If you do not have it already install [node.js](https://nodejs.org/en).
@@ -24,23 +23,31 @@ Currently we are still in early development of Beholder so we do not have any re
 5. Replace the `Native` folder in the code base with the [Mac Binaries Here](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/pegy8859_colorado_edu/ETYytOt6-dRDkEOfeW--43YB6-jo_Xnw0J_H8DrZOz-h1g?e=ouHBBh)
 6. Run `npm run build` in the terminal to build the Javascript code base.
 7. Run `npm start` from the terminal and the app should open.
-- *If you have issues with the camera feed try terminating the app and restarting it. You can tell the app is loading properly if the green play button appears.*
 
 ## Usage
 1. Run `npm start` from the terminal and the app should open.
 2. If you see a green play button you are good to Go!
+- *If you have issues with the camera feed try terminating the app and restarting it. You can tell the app is loading properly if the green play button appears.*
 
-### Creating Nodes
-To create nodes for now, we have a placeholder menu that appears as a drop down when you right click. There are...
+Learn more about using Beholder by reading our paper or watching our presentation [here](https://dl.acm.org/doi/10.1145/3550471.3564764)
 
-### The Detection Node
-For the detection to connect to markers and trigger keyboard emulation, you must create a `Webcam Detection` from the dropdown menu. You then need to connect the `FEED` property of that panel to the `Source` property of any marker nodes you want to use.
+### Currently Available Nodes
+To create nodes for now, we have a placeholder menu that appears as a drop down when you right click.
 
-### Running A Beholder Program
-Once you have a node chain that ends with a keyboard output node, you can test your application. All you need to do is click the green play button in the upper righthand corner. It should turn red to indicate that the program is running.
-
-### Saving and Loading Beholder Programs
-In the bottom right hand corner there are two icons, one is for downloading a program and the other is for uploading. Beholder saves programs as a JSON object and can be loaded at any time. We do not recommend modifying these files by hand.
+| Name                 | Category  | Description |
+| -------------------- | --------- | ----------- |
+| Detection Panel      | DETECTION | The root panel for all nodes. Connect the `FEED` attribute to a marker's `source` field for that marker to be detected. |
+| Detect Marker        | MARKER    | A node for capturing marker values. The ID and Timeout properties can be set with a number node. Timeout refers to how long before the marker is considered not present when it is no longer detected. This can help with flickering. |
+| Number               | VARIABLES | A node for setting integer values on other nodes. |
+| Press Key            | KEYS      | Triggers key presses on the device, will hold down the key while provided a true value. |
+| Tap Key              | KEYS      | Triggers key taps on the device, will tap the key once while provided a true value. |
+| NOT Gate             | LOGIC     | Equivalent for to the NOT operation for boolean values. |
+| AND Gate             | LOGIC     | Equivalent for to the AND operation for boolean values. |
+| OR Gate              | LOGIC     | Equivalent for to the OR operation for boolean values. |
+| Greater Than Gate    | LOGIC     | Passes along a true value when A > B. |
+| Less Than Gate       | LOGIC     | Passes along a true value when A < B. |
+| Value Change Trigger | LOGIC     | Sends a true value for one frame when the cumulative value change exceeds a threshold. |
+| Angle Change Trigger | LOGIC     | Sends a true value for one frame when the cumulative anlge change exceeds a threshold. |
 
 ## When developing
 - Use the `npm run dev` command instead of the `build` command (this will automatically rebuild the JS when you make changes).
