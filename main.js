@@ -1,8 +1,11 @@
 const { app, BrowserWindow, systemPreferences } = require("electron");
 const path = require("path");
 
-systemPreferences.askForMediaAccess('camera')
-systemPreferences.isTrustedAccessibilityClient(true);
+// mac stuff
+if (process.platform == 'darwin') {
+    systemPreferences.askForMediaAccess('camera');
+    systemPreferences.isTrustedAccessibilityClient(true);
+}
 
 function createWindow() {
   // Create the browser window.
