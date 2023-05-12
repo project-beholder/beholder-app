@@ -28,7 +28,7 @@ fn main() {
         marker_detector.observation_loop();
 
         let end_time = now.elapsed().as_millis();
-        println!("Loop time: {}", end_time-start_time);
+        // println!("Loop time: {}", end_time-start_time);
         
         let map = marker_detector.marker_map();
 
