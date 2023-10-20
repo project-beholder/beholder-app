@@ -14,8 +14,8 @@ fn main() {
     let file_path = "D:\\Code\\beholder-app\\Rust\\sample-json\\simple.json";
     let contents = std::fs::read_to_string(file_path).expect("Couldn't load file");
 
+    // Convert current JSON format into a rust JSON thing
     let json: BeholderJSON = json_parser::parse(&contents);
-    // let tree: BeholderTree = from_beholder_json(&json);
     
     let mut tree = from_beholder_json(&json);
 

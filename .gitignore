@@ -1,1 +1,4 @@
 /rust/target
+**/**/.DS_Store
+/ignoreme
+*/**/Cargo.lock
