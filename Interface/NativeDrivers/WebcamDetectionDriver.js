@@ -1,10 +1,14 @@
 const Marker = require('./NativeDrivers/Utils/Marker.js');
 const Vec2 = require('./NativeDrivers/Utils/Vec2.js');
 
-let detectExePath = `./Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`;
-if (IS_MAC_PROD) detectExePath = path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`);
-let detectImgPath = '../Native/LocalMarkerDetection/build/frame.jpg?';
-if (ELECTRON_ENV == 'PROD') detectImgPath = path.join(__dirname, '../../../Native/LocalMarkerDetection/build/frame.jpg?');
+// let detectExePath = `./Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`;
+// if (IS_MAC_PROD) detectExePath = path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`);
+// let detectImgPath = '../Native/LocalMarkerDetection/build/frame.jpg?';
+// if (ELECTRON_ENV == 'PROD') detectImgPath = path.join(__dirname, '../../../Native/LocalMarkerDetection/build/frame.jpg?');
+
+// Python executables
+let detectExePath = './NativePy/marker_detection';
+let detectImgPath = '../frame.jpg';
 
 const AXIS_VEC = new Vec2(1.0, 0);
 
@@ -34,7 +38,9 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
   })
 
   // detection thread init
-  const detectThread = spawn(detectExePath);
+  // const detectThread = spawn(detectExePath);
+  const detectThread = spawn('python', [detectExePath])
+
   detectThread.stdin.setDefaultEncoding('utf-8');
   window.addEventListener("beforeunload", () => { detectThread.kill() });
 
@@ -92,7 +98,7 @@ function WebcamDetectionDriver(cameraFeedChanges$) {
         try {
           const data = JSON.parse(rawData);
 
-          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `${detectImgPath}${Date.now()}`;
+          if (document.querySelector('.detection-img') && data.type === 'img-done') document.querySelector('.detection-img').src = `${detectImgPath}?t=${Date.now()}`;
           if (data.markers) {
             updateMarkers(data.markers);
             requestAnimationFrame(detectionLoop);

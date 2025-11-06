@@ -1,6 +1,8 @@
 // console.log(path.join(__dirname, `../../../Native/LocalMarkerDetection/build/detectMarker${process.platform == 'win32' ? '.exe' : ''}`));
-let keyEmulationPath = `./Native/KeyboardEmulation/build/keyboardEmulation${process.platform == 'win32' ? '.exe' : ''}`;
-if (IS_MAC_PROD) keyEmulationPath = path.join(__dirname, '../../../Native/KeyboardEmulation/build/keyboardEmulation');
+// let keyEmulationPath = `./Native/KeyboardEmulation/build/keyboardEmulation${process.platform == 'win32' ? '.exe' : ''}`;
+// if (IS_MAC_PROD) keyEmulationPath = path.join(__dirname, '../../../Native/KeyboardEmulation/build/keyboardEmulation');
+
+let keyEmulationPath = './NativePy/keyboard_emulation';
 
 let getKeyCode;
 if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
@@ -13,26 +15,37 @@ let shouldRun = false;
 let dt = 0;
 
 function pressKey(key) {
-  const hex = getKeyCode(key);
+  // const hex = getKeyCode(key);
   keyThread.stdin.cork();
-  keyThread.stdin.write(`P:${hex}\r\n`);
+  keyThread.stdin.write(`P:${key}\r\n`);
   keyThread.stdin.uncork();
 }
 
 function releaseKey(key) {
-  const hex = getKeyCode(key);
+  // const hex = getKeyCode(key);
   keyThread.stdin.cork();
-  keyThread.stdin.write(`R:${hex}\r\n`);
+  keyThread.stdin.write(`R:${key}\r\n`);
   keyThread.stdin.uncork();
 }
 
 function initKeyboard() {
-  keyThread = spawn(keyEmulationPath);
+  keyThread = spawn('python', [keyEmulationPath]);
   window.addEventListener("beforeunload", () => { keyThread.kill() });
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
       // console.log(`stdout keyboard: ${rawData}`);
       // const data = JSON.parse(rawData);
+  });
+
+  // Listen to errors from Python and/or spawning 
+  keyThread.stderr.on('data', (data) => {
+    console.error(`stderr keyboard: ${data}`);
+  });
+  keyThread.on('error', (err) => {
+    console.error('Failed to start subprocess keyboard.', err);
+  });
+  keyThread.on('exit', (code, signal) => {
+    if (code !== 0 && signal !== 'SIGTERM') console.log(`keyboard subprocess exited with code ${code} and signal ${signal}`);
   });
   
   // Make sure to kill the child process on exit or mem leak
