@@ -10,10 +10,10 @@ def press_key(key):
   if key == 'SPACE': kb.press(Key.space)
   elif key == 'RETURN': kb.press(Key.enter)
   elif key == 'TAB': kb.press(Key.tab)
-  elif key == '←': kb.press(Key.left)
-  elif key == '↑': kb.press(Key.up)
-  elif key == '→': kb.press(Key.right)
-  elif key == '↓': kb.press(Key.down)
+  elif key == 'LT': kb.press(Key.left)
+  elif key == 'UP': kb.press(Key.up)
+  elif key == 'RT': kb.press(Key.right)
+  elif key == 'DN': kb.press(Key.down)
 
   else: kb.press(key)
 
@@ -25,10 +25,10 @@ def release_key(key):
   if key == 'SPACE': kb.release(Key.space)
   elif key == 'RETURN': kb.release(Key.enter)  
   elif key == 'TAB': kb.release(Key.tab)
-  elif key == '←': kb.release(Key.left)
-  elif key == '↑': kb.release(Key.up)
-  elif key == '→': kb.release(Key.right)
-  elif key == '↓': kb.release(Key.down)
+  elif key == 'LT': kb.release(Key.left)
+  elif key == 'UP': kb.release(Key.up)
+  elif key == 'RT': kb.release(Key.right)
+  elif key == 'DN': kb.release(Key.down)
 
   else: kb.release(key)
 
@@ -38,9 +38,8 @@ debug["status"] = "All-ok"
 while True:
     # Input command as P:A or R:A
     command = input()
-
-    key_code = str(command[2:-1])
-    # print(f'Key: [{key_code}], {type(key_code)}, {len(key_code)}')
+    key_code = str(command[2:])
+    print(f'Key: [{key_code}], {type(key_code)}, {len(key_code)}')
 
     if command[0] == 'P': 
         press_key(key_code)

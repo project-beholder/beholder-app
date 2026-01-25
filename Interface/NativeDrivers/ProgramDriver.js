@@ -16,6 +16,12 @@ let dt = 0;
 
 function pressKey(key) {
   // const hex = getKeyCode(key);
+  if (key === '↑') key = 'UP';
+  if (key === '↓') key = 'DN';
+  if (key === '←') key = 'LT';
+  if (key === '→') key = 'RT';
+  // console.log(`Pressing key: ${key}`);
+
   keyThread.stdin.cork();
   keyThread.stdin.write(`P:${key}\r\n`);
   keyThread.stdin.uncork();
@@ -23,6 +29,11 @@ function pressKey(key) {
 
 function releaseKey(key) {
   // const hex = getKeyCode(key);
+  if (key === '↑') key = 'UP';
+  if (key === '↓') key = 'DN';
+  if (key === '←') key = 'LT';
+  if (key === '→') key = 'RT';
+  
   keyThread.stdin.cork();
   keyThread.stdin.write(`R:${key}\r\n`);
   keyThread.stdin.uncork();
