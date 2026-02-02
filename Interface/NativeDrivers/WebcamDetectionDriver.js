@@ -13,7 +13,7 @@ let detectImgPath = '../frame.jpg';
 const AXIS_VEC = new Vec2(1.0, 0);
 
 // Determine the command based on the OS
-let pythonCommand = 'python'; // Default to Windows standard
+pythonCommand = 'python'; // Default to Windows standard
 if (process.platform === 'darwin' || process.platform === 'linux') {
     pythonCommand = 'python3'; // Mac and Linux usually require this
 }
