@@ -8,6 +8,12 @@ let getKeyCode;
 if (process.platform === 'win32') getKeyCode = require('./NativeDrivers/Utils/WinKeyMap.js');
 else getKeyCode = require('./NativeDrivers/Utils/MacKeyMap.js');
 
+// Determine the command based on the OS
+let pythonCommand = 'python'; // Default to Windows standard
+if (process.platform === 'darwin' || process.platform === 'linux') {
+    pythonCommand = 'python3'; // Mac and Linux usually require this
+}
+
 let keyThread;
 let shouldRun = false;
 
@@ -40,7 +46,7 @@ function releaseKey(key) {
 }
 
 function initKeyboard() {
-  keyThread = spawn('python', [keyEmulationPath]);
+  keyThread = spawn(pythonCommand, [keyEmulationPath]);
   window.addEventListener("beforeunload", () => { keyThread.kill() });
   keyThread.stdin.setDefaultEncoding('utf-8');
   keyThread.stdout.on('data', (rawData) => {
