@@ -38,7 +38,7 @@ debug["status"] = "All-ok"
 while True:
     # Input command as P:A or R:A
     command = input()
-    key_code = str(command[2:])
+    key_code = str(command[2:]).rstrip()
     print(f'Key: [{key_code}], {type(key_code)}, {len(key_code)}')
 
     if command[0] == 'P': 
